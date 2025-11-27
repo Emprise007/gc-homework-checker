@@ -66,29 +66,29 @@
         
         /* 헤더 */
         h1 { text-align: center; color: var(--title-color); margin-bottom: 5px; font-size: 2.5em; transition: color 0.3s; }
-        .info-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 0.9em; }
+        .info-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            font-size: 0.9em; 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 10px;
+        }
         .reset-info { color: var(--text-color); opacity: 0.7; }
         #current-time-display { font-weight: bold; color: var(--text-color); }
 
-        /* 캐릭터 선택 섹션 제목 */
-        .char-select-title-group { text-align: center; margin-top: 35px; margin-bottom: 10px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; }
-        .char-select-title-group h2 { border-bottom: none; padding-bottom: 0; margin-top: 0; font-size: 1.5em; color: var(--text-color); }
-        .char-select-info { display: block; color: var(--text-color); opacity: 0.7; font-size: 0.9em; margin-top: 5px; margin-bottom: 15px; }
-        h3 { color: var(--text-color); margin-top: 15px; margin-bottom: 10px; font-size: 1.1em; }
-        
-        /* === 3. 필터 및 통계 영역 === */
+        /* === 3. 필터 버튼 영역 (상단) === */
         #filter-stats-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end; /* 오른쪽 정렬 */
             align-items: center;
-            margin-bottom: 15px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px; 
+            padding: 0;
+            border-bottom: none; 
         }
         #account-stats {
-            font-size: 1em;
-            font-weight: bold;
-            color: var(--text-color);
+            display: none; 
         }
         
         /* 필터 토글 버튼 스타일 */
@@ -107,15 +107,28 @@
             border-color: var(--accent-color);
         }
 
-        /* === 4. 모든 캐릭터 선택 영역 (상단) - 균등 배치 핵심 수정 === */
+        /* === 4. 모든 캐릭터 선택 영역 (상단) === */
         #character-selector { 
             display: flex; 
             flex-wrap: wrap; 
-            justify-content: flex-start; /* 좌측 정렬 */
+            justify-content: flex-start; 
             gap: 6px; 
-            margin-bottom: 25px; 
-            width: 100%; /* 전체 너비 사용 */
+            margin-bottom: 5px; 
+            width: 100%; 
         }
+
+        /* 캐릭터 선택 섹션 제목/정보 (이전 `char-select-title-group` 내부 요소) */
+        .char-select-info { 
+            display: block; 
+            color: var(--text-color); 
+            opacity: 0.7; 
+            font-size: 0.8em; 
+            text-align: center;
+            margin-top: 5px; 
+            margin-bottom: 25px; 
+        }
+        
+        h3 { color: var(--text-color); margin-top: 15px; margin-bottom: 10px; font-size: 1.1em; }
         
         /* === 5. 숙제 목록 및 사이드바 컨테이너 === */
         #main-content-area {
@@ -136,9 +149,30 @@
             z-index: 10;
         }
         
-        #favorite-sidebar h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; font-size: 1.1em; }
-        #favorite-list { display: flex; flex-direction: column; gap: 10px; min-height: 100px; }
-        .favorite-list-placeholder { color: var(--text-color); opacity: 0.5; font-style: italic; font-size: 0.9em; text-align: center; padding: 10px; }
+        #favorite-sidebar h3 { 
+            margin-top: 0; 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 5px; 
+            font-size: 1.1em; 
+        }
+        
+        /* 즐겨찾기 리스트 (세로 2열 배치) */
+        #favorite-list { 
+            display: flex; 
+            flex-direction: row; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            min-height: 100px; 
+        }
+        .favorite-list-placeholder { 
+            width: 100%; 
+            color: var(--text-color); 
+            opacity: 0.5; 
+            font-style: italic; 
+            font-size: 0.9em; 
+            text-align: center; 
+            padding: 10px; 
+        }
         
         /* 일일/주간 숙제 컨테이너 */
         #task-view-container { 
@@ -156,29 +190,46 @@
             box-shadow: inset 0 0 10px var(--shadow-color); 
         }
 
-        /* === 6. 캐릭터 버튼 공통 스타일 - 균등 배치 핵심 수정 === */
-        .char-btn { 
-            /* 12개 균등 배치를 위한 Flexbox 설정 */
-            flex: 1 1 calc(100% / 12 - 6px); /* 100%를 12등분하고 gap 6px 반영 */
-            min-width: 0; /* flex item의 기본 너비 오버플로우 방지 */
+        /* === 6. 캐릭터 버튼 공통 스타일 === */
+        
+        /* 모든 캐릭터 선택창 버튼 (12개 균등 배치) */
+        #character-selector .char-btn {
+            flex: 1 1 calc(100% / 12 - 6px); 
+            min-width: 0; 
             max-width: calc(100% / 12 - 6px);
-            text-align: center; /* 텍스트 중앙 정렬 */
-            
-            /* 기존 스타일 유지 */
+        }
+
+        /* 즐겨찾기 버튼 스타일 (세로 2열 배치) */
+        #favorite-list .char-btn {
+            flex: 1 1 calc(50% - 5px); 
+            max-width: calc(50% - 5px);
+            font-size: 0.9em;
+            padding: 8px 5px; 
+            white-space: normal; 
+        }
+        #favorite-list .char-btn span {
+             display: block;
+             overflow: visible; 
+             white-space: normal; 
+        }
+
+
+        .char-btn { 
+            text-align: center; 
             background-color: var(--bg-item); 
             color: var(--text-color); 
             border: 1px solid var(--border-color); 
-            padding: 8px 0px; /* 좌우 패딩 제거 (균등 너비 확보), 상하 패딩 유지 */
+            padding: 8px 0px; 
             border-radius: 20px; 
             cursor: grab; 
             font-size: 0.85em; 
             transition: all 0.2s ease-in-out; 
             user-select: none;
             position: relative; 
-            white-space: nowrap; /* 글자가 길어도 한 줄 유지 (text-overflow는 필요에 따라 추가) */
         }
-        /* 이름이 길어질 경우 말줄임표 처리 (선택 사항) */
-        .char-btn span {
+        
+        /* 이름이 길어질 경우 말줄임표 처리 (상단 버튼에만 적용) */
+        #character-selector .char-btn span {
              display: block;
              overflow: hidden;
              text-overflow: ellipsis;
@@ -190,8 +241,8 @@
         /* 캐릭터 버튼 내 프로그레스 바 */
         .progress-bar-container {
             height: 3px;
-            width: 90%; /* 버튼 중앙에 맞추기 위해 너비 조정 */
-            margin: 5px auto 0 auto; /* 중앙 정렬 */
+            width: 90%; 
+            margin: 5px auto 0 auto; 
             background-color: var(--progress-bar-bg);
             border-radius: 2px;
             overflow: hidden;
@@ -202,7 +253,21 @@
             transition: width 0.3s;
         }
         
-        /* === 7. 숙제 아이템 및 통계 영역 === */
+        /* === 7. 현재 선택 캐릭터 그룹 === */
+        #current-char-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px; 
+            margin-bottom: 10px;
+        }
+        
+        #current-char-name {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        /* === 8. 숙제 아이템 및 통계 영역 === */
         .task-item { 
             display: flex; 
             align-items: center; 
@@ -213,40 +278,18 @@
             transition: all 0.3s; 
             font-size: 1em; 
             justify-content: flex-start; 
-            
-            /* 배경 이미지 설정 (배경 이미지 비활성화를 위해 주석 처리) */
-            /* background-size: cover; */
-            /* background-position: center; */
-            /* background-repeat: no-repeat; */
-            /* position: relative; */
-            /* overflow: hidden; */
-            /* color: #ffffff; */ /* 텍스트 색상 다시 테마 기본으로 */
             background-color: var(--bg-item);
             color: var(--text-color); 
         }
         
-        /* 그라데이션 오버레이 제거 (요청에 따라) */
-        .task-item::before {
-            content: none;
-        }
-        
-        /* 완료된 아이템 오버레이 (흐리게 및 어둡게) */
         .task-item.done { 
              opacity: 0.6;
              background-color: var(--bg-item);
         }
         
-        /* 내부 콘텐츠가 오버레이 위로 오도록 설정 */
-        .task-item > * {
-            z-index: 2; 
-        }
-        
-        /* 체크박스 색상 조정 (다크 모드 기준) */
         .task-item input[type="checkbox"] {
-             filter: none; /* 필터 제거 (배경 이미지 없으므로 기본 색상 유지) */
+             filter: none; 
              margin-right: 5px;
-             /* 다크 모드일 때만 인버트 적용 */
-             /* .dark-mode .task-item input[type="checkbox"] { filter: invert(0.8); } */
         }
         
         /* 레이블 그룹 */
@@ -261,8 +304,8 @@
         .task-tag {
             font-size: 0.7em;
             font-weight: bold;
-            color: var(--text-color); /* 테마 색상으로 복구 */
-            background-color: var(--sidebar-bg); /* 테마 색상으로 복구 */
+            color: var(--text-color); 
+            background-color: var(--sidebar-bg); 
             padding: 2px 6px;
             border-radius: 10px;
             margin-left: 8px;
@@ -271,24 +314,10 @@
         
         /* 요일 스티커 전용 색상 */
         .task-tag.day {
-            background-color: #ffddff; /* 밝은 자주색 배경 */
+            background-color: #ffddff; 
             color: #800080;
         }
 
-        /* 던전별 이미지 클래스 정의 (요청에 따라 유지, 배경 이미지는 .task-item에서 비활성화됨) */
-        .bg-berkas { }
-        .bg-tower { }
-        .bg-tero { }
-        .bg-temple { }
-        .bg-kounat { }
-        .bg-corridor { } 
-        .bg-judge { }
-        .bg-abyss { }
-        .bg-void_mon, .bg-void_wed, .bg-void_fri { } 
-        .bg-w_furnace { }
-        .bg-w_sanctum { }
-        .bg-w_laby { }
-        
         /* 캐릭터별 완료율 표시 영역 */
         #daily-stats-display, #weekly-stats-display {
             padding: 10px 0;
@@ -318,7 +347,7 @@
         }
 
 
-        /* 모바일 반응형 (12개 균등 배치가 깨질 때, 버튼 크기를 조정) */
+        /* 모바일 반응형 */
         @media (max-width: 950px) {
             #main-content-area { flex-direction: column; }
             #favorite-sidebar { width: 100%; min-width: auto; }
@@ -327,14 +356,20 @@
             .container { padding: 15px; }
             #theme-toggle { top: 15px; right: 15px; padding: 6px 10px; font-size: 0.8em; }
             .info-header { flex-direction: column; align-items: flex-start; gap: 5px; }
-            #filter-stats-container { flex-direction: column; align-items: flex-start; gap: 10px; }
+            #filter-stats-container { justify-content: flex-start; margin-top: 10px; } 
+            #current-char-group { flex-direction: column; align-items: flex-start; }
             
-            /* 모바일에서 버튼 크기 조정 (예: 6개씩 배치) */
+            /* 모바일에서 버튼 크기 조정 (6개씩 배치) */
             #character-selector { justify-content: space-around; }
-            .char-btn {
+            #character-selector .char-btn {
                  flex: 1 1 calc(100% / 6 - 6px);
                  max-width: calc(100% / 6 - 6px);
                  font-size: 0.75em;
+            }
+            /* 모바일에서 즐겨찾기 버튼 크기 조정 (4개씩 배치) */
+            #favorite-list .char-btn {
+                flex: 1 1 calc(25% - 7.5px);
+                max-width: calc(25% - 7.5px);
             }
         }
     </style>
@@ -351,19 +386,17 @@
     </div>
 
 
-    <div class="char-select-title-group">
-        <h2>모든 캐릭터</h2>
-        <span class="char-select-info">캐릭터를 즐겨찾기 사이드바로 드래그하거나, 아래에서 순서를 변경할 수 있습니다.</span>
-    </div>
-    
     <div id="filter-stats-container">
-        <div id="account-stats"></div>
         <button id="filter-toggle-btn" onclick="toggleFilter()">🔍 숙제 남은 캐릭터만 보기</button>
     </div>
     
     <div id="character-selector" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)"></div>
     
-    <h2 id="current-char-name"></h2>
+    <span class="char-select-info">캐릭터를 즐겨찾기 사이드바로 드래그하거나, 아래에서 순서를 변경할 수 있습니다.</span>
+    
+    <div id="current-char-group">
+        <h2 id="current-char-name"></h2>
+        </div>
     
     <div id="main-content-area">
         <div id="favorite-sidebar" 
@@ -632,8 +665,10 @@
 
     // === 4. 통계 및 필터 로직 ===
 
-    // 계정 전체 통계 업데이트
+    // 계정 전체 통계 업데이트 (함수 자체는 유지하되, 렌더링은 하지 않음)
     function updateAccountStats() {
+        // 이 함수에서 DOM에 데이터를 표시하는 코드는 제거됨.
+        // 캐릭터 통계 계산을 위해 데이터만 유지.
         let totalDaily = 0;
         let doneDaily = 0;
         let totalWeekly = 0;
@@ -653,14 +688,7 @@
             doneDaily += sharedStatus.completed;
         }
 
-        const dailyPercent = totalDaily > 0 ? ((doneDaily / totalDaily) * 100).toFixed(1) : 100;
-        const weeklyPercent = totalWeekly > 0 ? ((doneWeekly / totalWeekly) * 100).toFixed(1) : 100;
-
-        const statsText = `
-            일일 숙제: ${doneDaily}/${totalDaily} (${dailyPercent}%) | 
-            주간 숙제: ${doneWeekly}/${totalWeekly} (${weeklyPercent}%)
-        `;
-        document.getElementById('account-stats').innerText = statsText;
+        // DOM 업데이트 코드는 제거함.
     }
 
     // 필터 토글
@@ -680,7 +708,7 @@
         }
     }
     
-    // === 5. DND 및 핸들러 ===
+    // === 5. DND 및 핸들러 (생략) ===
     function handleDragStart(e) { 
         draggedElement = e.target;
         const charName = draggedElement.getAttribute('data-char-name');
@@ -998,23 +1026,24 @@
             document.getElementById('task-view-container').style.display = 'none';
             document.getElementById('daily-stats-display').innerHTML = ''; 
             document.getElementById('weekly-stats-display').innerHTML = ''; 
+            // 필터 버튼은 이제 항상 상단에 있으므로 display를 변경할 필요 없음
             return;
         }
         
         document.getElementById('task-view-container').style.display = 'flex';
         document.getElementById('current-char-name').innerText = `현재 선택 캐릭터: [${currentCharacter.name}]`;
         
-        // === 캐릭터별 통계 분리 표시 ===
+        // === 캐릭터별 통계 분리 표시 (요청 사항 반영: 0/7, 0/18 제거) ===
         
         const dailyStatsHtml = `
             <div class="stat-item">
-                <span>일일 완료율: <b>${currentCharacter.dailyStats.completedCount}/${currentCharacter.dailyStats.totalCount} (${currentCharacter.dailyStats.percentage}%)</b></span>
+                <span>일일 완료율: <b>${currentCharacter.dailyStats.percentage}%</b></span>
                 <div class="stat-bar-container"><div class="stat-bar" style="width: ${currentCharacter.dailyStats.percentage}%;"></div></div>
             </div>
         `;
         const weeklyStatsHtml = `
             <div class="stat-item">
-                <span>주간 완료율: <b>${currentCharacter.weeklyStats.completedCount}/${currentCharacter.weeklyStats.totalCount} (${currentCharacter.weeklyStats.percentage}%)</b></span>
+                <span>주간 완료율: <b>${currentCharacter.weeklyStats.percentage}%</b></span>
                 <div class="stat-bar-container"><div class="stat-bar" style="width: ${currentCharacter.weeklyStats.percentage}%;"></div></div>
             </div>
         `;
@@ -1095,7 +1124,7 @@
         initializeData();
         renderCharacterSelector(); // 캐릭터 선택 버튼 렌더링
         renderTaskList(); // 숙제 목록 및 통계 렌더링
-        updateAccountStats(); // 계정 전체 통계 갱신
+        updateAccountStats(); // 계정 전체 통계 갱신 (데이터만)
         updateFilterButton(); // 필터 버튼 상태 갱신
         updateCurrentTime(); // 현재 시간 갱신
     }
