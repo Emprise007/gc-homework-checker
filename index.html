@@ -13,7 +13,7 @@
             --bg-item: #e8e8e8;
             --text-color: #333333;
             --title-color: #333333; 
-            --accent-color: #cc0000; /* Red for general important elements */
+            --accent-color: #cc0000; /* Red for general important elements (used for filter/drag) */
             --shadow-color: rgba(0, 0, 0, 0.15);
             --border-color: #ccc;
             --shared-tag: #666666; 
@@ -32,7 +32,7 @@
             --bg-item: #333333;
             --text-color: #f0f0f0;
             --title-color: #ffffff; 
-            --accent-color: #ff3333; 
+            --accent-color: #ff3333; /* Red for general important elements (used for filter/drag) */
             --shadow-color: rgba(255, 255, 255, 0.1);
             --border-color: #444;
             --shared-tag: #999999; 
@@ -358,9 +358,10 @@
             color: var(--text-color);
             opacity: 0.7;
         }
+        /* 'Made by 깡' 색상을 하늘색 계열로 변경 */
         .footer-credit {
             font-weight: bold;
-            color: var(--accent-color);
+            color: #00bfff; /* 하늘색 계열 (Deep Sky Blue) */
         }
 
 
@@ -947,6 +948,9 @@
         const dailyPer = char.dailyStats.percentage || 0;
         const weeklyPer = char.weeklyStats.percentage || 0;
         const overallPercent = dailyPer * 0.5 + weeklyPer * 0.5; 
+        
+        // **수정 1: 즐겨찾기 별표 추가**
+        const favoriteStar = FAVORITE_NAMES.includes(charName) ? '⭐️ ' : ''; 
 
         const button = document.createElement('button');
         button.className = `char-btn ${char.id == currentChrId ? 'active' : ''}`;
@@ -955,7 +959,7 @@
 
         // 텍스트와 프로그레스 바를 포함하는 구조 생성
         button.innerHTML = `
-            <span>${char.name}</span>
+            <span>${favoriteStar}${char.name}</span>
             <div class="progress-bar-container">
                 <div class="progress-bar" style="width: ${overallPercent}%;"></div>
             </div>
@@ -1049,7 +1053,9 @@
         }
         
         document.getElementById('task-view-container').style.display = 'flex';
-        document.getElementById('current-char-name').innerText = `현재 선택 캐릭터: [${currentCharacter.name}]`;
+        // **수정 2: 즐겨찾기 별표를 현재 선택 캐릭터 이름에도 적용**
+        const favoriteStar = FAVORITE_NAMES.includes(currentCharacter.name) ? '⭐️ ' : '';
+        document.getElementById('current-char-name').innerText = `현재 선택 캐릭터: [${favoriteStar}${currentCharacter.name}]`;
         
         // === 캐릭터별 통계 분리 표시 (요청 사항 반영: 0/7, 0/18 제거) ===
         
