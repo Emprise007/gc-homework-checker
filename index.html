@@ -20,6 +20,7 @@
             --drag-bg: #ffcccc;
             --favorite-bg: #f8f8ff; /* 연한 파랑 계열 */
             --favorite-border: #d3d3d3;
+            --sidebar-bg: #eeeeee; /* 사이드바 배경 */
         }
 
         /* Dark Mode (Class 적용 시) (Monochromatic) */
@@ -36,6 +37,7 @@
             --drag-bg: #550000;
             --favorite-bg: #111111; /* 매우 어두운 회색 */
             --favorite-border: #333333;
+            --sidebar-bg: #222222;
         }
 
         /* === 2. 기본 스타일 === */
@@ -74,16 +76,6 @@
             align-items: center;
             margin-bottom: 25px;
             font-size: 0.9em;
-        }
-
-        .reset-info {
-            color: var(--text-color); 
-            opacity: 0.7; 
-        }
-
-        #current-time-display {
-            font-weight: bold;
-            color: var(--text-color);
         }
 
         /* 캐릭터 선택 섹션 제목 */
@@ -127,34 +119,8 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        #theme-toggle:hover { background: var(--accent-color); color: white; }
 
-        /* === 4. 즐겨찾기 영역 === */
-        #favorite-selector {
-            background-color: var(--favorite-bg);
-            border: 2px dashed var(--favorite-border);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            min-height: 50px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            align-items: center;
-            justify-content: center;
-        }
-        #favorite-selector.drag-over {
-            border-color: var(--accent-color);
-            background-color: var(--drag-bg);
-        }
-        .favorite-placeholder {
-            color: var(--text-color);
-            opacity: 0.5;
-            font-style: italic;
-            font-size: 0.9em;
-        }
-
-        /* === 5. 캐릭터 선택 버튼 (DND 적용) === */
+        /* === 4. 모든 캐릭터 선택 영역 (상단) === */
         #character-selector { 
             display: flex; 
             flex-wrap: wrap; 
@@ -162,34 +128,53 @@
             gap: 6px; 
             margin-bottom: 25px; 
         }
-        .char-btn { 
-            background-color: var(--bg-item); 
-            color: var(--text-color); 
-            border: 1px solid var(--border-color); 
-            padding: 8px 12px; 
-            border-radius: 20px; 
-            cursor: grab; 
-            font-size: 0.85em; 
-            transition: all 0.2s ease-in-out; /* 호버 애니메이션 부드럽게 */
-            user-select: none;
+        
+        /* === 5. 숙제 목록 및 사이드바 컨테이너 === */
+        #main-content-area {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
         }
         
-        /* 고유 색상 호버 및 활성화 스타일은 JS에서 적용 */
-        .char-btn.dragging {
-            opacity: 0.5;
-            box-shadow: 0 5px 15px var(--shadow-color);
+        /* 즐겨찾기 사이드바 */
+        #favorite-sidebar {
+            width: 200px;
+            min-width: 180px;
+            background-color: var(--sidebar-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            align-self: flex-start; /* 상단 고정 */
         }
         
-        .char-btn.drag-over {
-            border: 2px dashed var(--accent-color);
-            background-color: var(--drag-bg);
+        #favorite-sidebar h3 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            font-size: 1.1em;
+        }
+        
+        #favorite-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 100px;
         }
 
-        /* === 6. 숙제 목록 스타일 === */
+        .favorite-list-placeholder {
+            color: var(--text-color);
+            opacity: 0.5;
+            font-style: italic;
+            font-size: 0.9em;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        /* 일일/주간 숙제 컨테이너 */
         #task-view-container { 
+            flex: 1; 
             display: flex; 
             gap: 30px; 
-            margin-top: 20px;
         }
         .task-column { 
             flex: 1; 
@@ -199,6 +184,31 @@
             box-shadow: inset 0 0 10px var(--shadow-color);
         }
 
+        /* === 6. 캐릭터 버튼 공통 스타일 === */
+        .char-btn { 
+            background-color: var(--bg-item); 
+            color: var(--text-color); 
+            border: 1px solid var(--border-color); 
+            padding: 8px 12px; 
+            border-radius: 20px; 
+            cursor: grab; 
+            font-size: 0.85em; 
+            transition: all 0.2s ease-in-out; 
+            user-select: none;
+        }
+        
+        /* DND 스타일 */
+        .char-btn.dragging {
+            opacity: 0.5;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        
+        .char-btn.drag-over {
+            border: 2px dashed var(--accent-color);
+            background-color: var(--drag-bg);
+        }
+        
+        /* === 7. 숙제 아이템 스타일 (이전과 동일) === */
         .task-item { 
             display: flex; 
             align-items: center; 
@@ -217,7 +227,6 @@
         .task-label-group { display: flex; align-items: center; margin-left: 10px; }
         .task-label { font-weight: bold; margin-right: 5px; }
         
-        /* 체크박스 스타일 */
         input[type="checkbox"] {
             width: 18px;
             height: 18px;
@@ -243,7 +252,19 @@
         }
         
         /* 모바일 반응형 */
-        @media (max-width: 768px) {
+        @media (max-width: 950px) {
+            #main-content-area {
+                flex-direction: column; 
+            }
+            #favorite-sidebar {
+                width: 100%;
+                min-width: auto;
+            }
+            #favorite-list {
+                flex-direction: row; /* 모바일에서는 가로로 배치 */
+                flex-wrap: wrap;
+                justify-content: center;
+            }
             #task-view-container {
                 flex-direction: column; 
             }
@@ -264,31 +285,36 @@
         <div id="current-time-display"></div>
     </div>
 
-    <div class="char-select-title-group">
-        <h2>⭐️ 즐겨찾기 캐릭터</h2>
-        <span class="char-select-info">캐릭터를 드래그하여 등록/제거하세요.</span>
-    </div>
-    <div id="favorite-selector" ondragover="handleDragOver(event)" ondrop="handleDropToFavorite(event)" ondragleave="handleDragLeave(event)">
-        <span class="favorite-placeholder">여기에 자주 사용하는 캐릭터를 드래그하세요.</span>
-    </div>
 
     <div class="char-select-title-group">
         <h2>모든 캐릭터</h2>
-        <span class="char-select-info">(드래그 앤 드롭으로 순서 변경 가능)</span>
+        <span class="char-select-info">캐릭터를 즐겨찾기 사이드바로 드래그하거나, 아래에서 순서를 변경할 수 있습니다.</span>
     </div>
-    <div id="character-selector"></div>
+    <div id="character-selector" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)"></div>
     
     <h2 id="current-char-name"></h2>
-
-    <div id="task-view-container">
-        <div class="task-column">
-            <h3>📅 일일 숙제 (캐릭터별 및 계정 공유 일일)</h3>
-            <div id="daily-list"></div>
+    
+    <div id="main-content-area">
+        <div id="favorite-sidebar" 
+             ondragover="handleDragOver(event)" 
+             ondrop="handleDropToFavorite(event)" 
+             ondragleave="handleDragLeave(event)">
+            <h3>⭐️ 즐겨찾기</h3>
+            <div id="favorite-list">
+                <span class="favorite-list-placeholder">캐릭터를 여기에 드래그하세요.</span>
+            </div>
         </div>
 
-        <div class="task-column">
-            <h3>⚔️ 주간 숙제 (캐릭터별)</h3>
-            <div id="weekly-list"></div>
+        <div id="task-view-container">
+            <div class="task-column">
+                <h3>📅 일일 숙제 (캐릭터별 및 계정 공유 일일)</h3>
+                <div id="daily-list"></div>
+            </div>
+
+            <div class="task-column">
+                <h3>⚔️ 주간 숙제 (캐릭터별)</h3>
+                <div id="weekly-list"></div>
+            </div>
         </div>
     </div>
 
@@ -300,47 +326,27 @@
 <script>
     // === 1. 기본 데이터 설정 ===
     
-    // 캐릭터별 고유 색상 정의 (Hex code)
     const CHAR_COLORS = {
-        '엘리시스': '#ff0000',  // 빨간색
-        '리르': '#9acd32',      // 연두색
-        '아르메': '#a020f0',    // 밝은 보라색 (Purple)
-        '라스': '#87ceeb',      // 하늘색 (Sky Blue)
-        '라이언': '#008000',    // 초록색 (Green)
-        '로난': '#4169e1',      // 남색 (Royal Blue, 군색에서 변경)
-        '에이미': '#ff69b4',    // 분홍색 (Hot Pink)
-        '진': '#ff4500',        // 빨간색 (Orange Red, 엘리시스와 구분)
-        '지크하트': '#000000',  // 검은색 (Black)
-        '마리': '#0000ff',      // 파란색 (Blue)
-        '디오': '#800080',      // 보라색 (Purple)
-        '제로': '#3cb371',      // 초록색 (Medium Sea Green)
-        '레이': '#8a2be2',      // 보라색+분홍색 (Blue Violet)
-        '루퍼스': '#b22222',    // 진홍색 (Fire Brick)
-        '베이가스': '#483d8b',  // 진보라색 (Dark Slate Blue)
-        '린': '#808080',        // 회색 (Gray)
-        '아신': '#00bfff',      // 하늘색 (Deep Sky Blue)
-        '라임': '#32cd32',      // 라임색 (Lime Green)
-        '에델': '#4169e1',      // 파란색 (Royal Blue)
-        '데카네': '#00ffff',    // 밝은 파란색 (Cyan)
-        '아이': '#afeeee',      // 하늘색 (Pale Turquoise)
-        '칼리아': '#c71585',    // 빨간색 (Medium Violet Red)
-        '우노': '#008b8b',      // 초록색+파란색 (Dark Cyan)
-        '이리스': '#add8e6'     // 연한 하늘색 (Light Blue)
+        '엘리시스': '#ff0000', '리르': '#9acd32', '아르메': '#a020f0', '라스': '#87ceeb',
+        '라이언': '#008000', '로난': '#4169e1', '에이미': '#ff69b4', '진': '#ff4500', 
+        '지크하트': '#000000', '마리': '#0000ff', '디오': '#800080', '제로': '#3cb371', 
+        '레이': '#8a2be2', '루퍼스': '#b22222', '베이가스': '#483d8b', '린': '#808080', 
+        '아신': '#00bfff', '라임': '#32cd32', '에델': '#4169e1', '데카네': '#00ffff', 
+        '아이': '#afeeee', '칼리아': '#c71585', '우노': '#008b8b', '이리스': '#add8e6'
     };
 
-    // 24개 캐릭터 리스트 
     let CHARACTER_NAMES = [
         '엘리시스', '리르', '아르메', '라스', '라이언', '로난', '에이미', '진', '지크하트', '마리', 
         '디오', '제로', '레이', '루퍼스', '베이가스', '린', '아신', '라임', '에델', '데카네', 
         '아이', '칼리아', '우노', '이리스'
     ];
     
-    const DUNGEON_DATA = { /* 던전 데이터는 이전과 동일 */ }; // 생략
+    const DUNGEON_DATA = { /* 던전 데이터는 긴 관계로 생략 */ }; // 이전 코드와 동일
 
     let characters = []; 
     let currentChrId = null; 
     let draggedElement = null; 
-    let FAVORITE_NAMES = []; // 즐겨찾기 목록 (캐릭터 이름 저장)
+    let FAVORITE_NAMES = []; 
 
     // === 2. 보조 함수 ===
     
@@ -354,7 +360,7 @@
 
     // === 3. 데이터 로직 (생략된 부분은 이전과 동일) ===
     
-    // 던전 데이터는 긴 관계로 이전 코드와 동일하게 처리된다고 가정하고 생략했습니다.
+    // 던전 데이터는 긴 관계로 이전 코드와 동일하게 처리된다고 가정하고 추가
     const DUNGEON_DATA_PLACEHOLDER = {
         daily: [
             { id: 'berkas', name: '베르카스의 요새', max: 1, shared: false },
@@ -398,7 +404,6 @@
         });
         return tasks;
     };
-
 
     function initializeData() {
         const savedOrder = localStorage.getItem('characterOrder');
@@ -450,12 +455,16 @@
     
     function checkAndApplyReset(currentChars, lastResetTime) { /* 이전과 동일 */ }
 
-    // DND 로직 수정 (즐겨찾기 기능 추가)
+    // === 4. DND 로직 수정 (즐겨찾기 순서 변경 및 제거) ===
 
     function handleDragStart(e) {
         draggedElement = e.target;
         const charName = draggedElement.getAttribute('data-char-name');
         e.dataTransfer.setData('text/plain', charName);
+        
+        const isFavoriteDrag = draggedElement.closest('#favorite-list') !== null;
+        e.dataTransfer.setData('application/json', isFavoriteDrag ? 'favorite' : 'all');
+        
         e.dataTransfer.effectAllowed = 'move';
         e.target.classList.add('dragging');
     }
@@ -463,72 +472,125 @@
     function handleDragOver(e) {
         e.preventDefault(); 
         e.dataTransfer.dropEffect = 'move';
-        const target = e.target.closest('.char-btn') || e.target.closest('#favorite-selector');
         
+        // 드래그 오버 상태 초기화
         document.querySelectorAll('.char-btn.drag-over').forEach(btn => btn.classList.remove('drag-over'));
-        document.querySelector('#favorite-selector').classList.remove('drag-over');
-
-        if (target && target.classList.contains('char-btn') && target !== draggedElement) {
-             target.classList.add('drag-over');
-        } else if (target && target.id === 'favorite-selector') {
-             target.classList.add('drag-over');
+        document.querySelector('#favorite-sidebar').classList.remove('drag-over');
+        
+        const target = e.target.closest('.char-btn') || e.target.closest('#favorite-sidebar') || e.target.closest('#character-selector');
+        
+        if (target) {
+            if (target.id === 'favorite-sidebar' && e.dataTransfer.getData('application/json') !== 'favorite') {
+                // '모든 캐릭터'에서 '즐겨찾기 사이드바'로 드래그하는 경우
+                target.classList.add('drag-over');
+            } else if (target.classList.contains('char-btn') && target !== draggedElement) {
+                // 버튼 위로 드래그하는 경우 (순서 변경)
+                if (target.closest('#favorite-list') && e.dataTransfer.getData('application/json') === 'favorite') {
+                    // 즐겨찾기 내 순서 변경
+                    target.classList.add('drag-over');
+                } else if (target.closest('#character-selector') && e.dataTransfer.getData('application/json') !== 'favorite') {
+                    // 모든 캐릭터 내 순서 변경
+                    target.classList.add('drag-over');
+                }
+            } else if (target.id === 'character-selector' && e.dataTransfer.getData('application/json') === 'favorite') {
+                // '즐겨찾기'에서 '모든 캐릭터' 영역으로 드래그하는 경우 (제거)
+                target.classList.add('drag-over');
+            }
         }
     }
     
     function handleDragLeave(e) {
-        e.target.classList.remove('drag-over');
-        if (e.target.id === 'favorite-selector') {
+        if (e.target.classList.contains('char-btn')) {
+            e.target.classList.remove('drag-over');
+        }
+        if (e.target.id === 'favorite-sidebar') {
             e.target.classList.remove('drag-over');
         }
     }
-
-    // 즐겨찾기 영역으로 드롭
+    
     function handleDropToFavorite(e) {
         e.preventDefault();
         const droppedName = e.dataTransfer.getData('text/plain');
         
-        document.querySelector('#favorite-selector').classList.remove('drag-over');
+        document.querySelector('#favorite-sidebar').classList.remove('drag-over');
 
-        if (droppedName && !FAVORITE_NAMES.includes(droppedName)) {
-            FAVORITE_NAMES.push(droppedName);
-            localStorage.setItem('favoriteCharacters', JSON.stringify(FAVORITE_NAMES));
-            render();
+        const target = e.target.closest('.char-btn');
+        const isFavoriteDrag = e.dataTransfer.getData('application/json') === 'favorite';
+        
+        if (isFavoriteDrag) {
+            // 1. 즐겨찾기 내에서 순서 변경
+            if (target && target.closest('#favorite-list')) {
+                const sourceIndex = FAVORITE_NAMES.indexOf(droppedName);
+                const targetName = target.getAttribute('data-char-name');
+                const targetIndex = FAVORITE_NAMES.indexOf(targetName);
+                
+                if (sourceIndex !== targetIndex) {
+                    const [removed] = FAVORITE_NAMES.splice(sourceIndex, 1);
+                    FAVORITE_NAMES.splice(targetIndex > sourceIndex ? targetIndex : targetIndex, 0, removed);
+                    localStorage.setItem('favoriteCharacters', JSON.stringify(FAVORITE_NAMES));
+                }
+            }
+        } else {
+            // 2. 새로운 캐릭터 즐겨찾기에 추가
+            if (droppedName && !FAVORITE_NAMES.includes(droppedName)) {
+                
+                if (target && target.closest('#favorite-list')) {
+                    // 특정 캐릭터 위로 드롭 시 해당 캐릭터 앞에 추가
+                    const targetName = target.getAttribute('data-char-name');
+                    const targetIndex = FAVORITE_NAMES.indexOf(targetName);
+                    FAVORITE_NAMES.splice(targetIndex, 0, droppedName);
+                } else {
+                    // 빈 공간 또는 사이드바 자체에 드롭 시 맨 뒤에 추가
+                    FAVORITE_NAMES.push(droppedName);
+                }
+                
+                localStorage.setItem('favoriteCharacters', JSON.stringify(FAVORITE_NAMES));
+            }
         }
+        
+        render();
     }
 
-    // 모든 캐릭터 영역 내 순서 변경 드롭
+    // 모든 캐릭터 영역 내 드롭 (순서 변경 또는 즐겨찾기 제거)
     function handleDrop(e) {
         e.preventDefault();
-        const target = e.target.closest('.char-btn');
         const droppedName = e.dataTransfer.getData('text/plain');
+        const isFavoriteDrag = e.dataTransfer.getData('application/json') === 'favorite';
+
+        document.getElementById('character-selector').classList.remove('drag-over');
+        document.querySelectorAll('.char-btn.drag-over').forEach(btn => btn.classList.remove('drag-over'));
         
-        if (draggedElement && target && draggedElement !== target) {
-            
-            // 1. 순서 변경
+        const target = e.target.closest('.char-btn');
+        
+        if (isFavoriteDrag) {
+            // 1. 즐겨찾기 취소 (모든 캐릭터 목록 또는 그 주변에 드롭)
+            if (FAVORITE_NAMES.includes(droppedName)) {
+                removeFavorite(droppedName);
+            }
+        } else if (target) {
+            // 2. 모든 캐릭터 목록 내 순서 변경
             const sourceIndex = CHARACTER_NAMES.indexOf(droppedName);
             const targetName = target.getAttribute('data-char-name');
             const targetIndex = CHARACTER_NAMES.indexOf(targetName);
 
-            const [removed] = CHARACTER_NAMES.splice(sourceIndex, 1);
-            CHARACTER_NAMES.splice(targetIndex > sourceIndex ? targetIndex : targetIndex, 0, removed);
-            
-            localStorage.setItem('characterOrder', JSON.stringify(CHARACTER_NAMES));
-            
-            render();
-        } else if (target && FAVORITE_NAMES.includes(droppedName)) {
-            // 2. 즐겨찾기 내에서 즐겨찾기 영역으로 드롭 시 순서 변경 (구현 생략, 현재는 모든 캐릭터 영역만 순서 변경)
+            if (sourceIndex !== targetIndex) {
+                const [removed] = CHARACTER_NAMES.splice(sourceIndex, 1);
+                CHARACTER_NAMES.splice(targetIndex > sourceIndex ? targetIndex : targetIndex, 0, removed);
+                localStorage.setItem('characterOrder', JSON.stringify(CHARACTER_NAMES));
+            }
         }
-        document.getElementById('character-selector').querySelectorAll('.char-btn').forEach(btn => btn.classList.remove('drag-over'));
+        
+        render();
     }
 
     function handleDragEnd(e) {
         e.target.classList.remove('dragging');
         draggedElement = null;
-        document.getElementById('character-selector').querySelectorAll('.char-btn').forEach(btn => btn.classList.remove('drag-over'));
-        document.querySelector('#favorite-selector').classList.remove('drag-over');
+        document.querySelectorAll('.char-btn.drag-over').forEach(btn => btn.classList.remove('drag-over'));
+        document.querySelector('#favorite-sidebar').classList.remove('drag-over');
+        document.querySelector('#character-selector').classList.remove('drag-over');
     }
     
-    // 즐겨찾기 캐릭터 제거
     function removeFavorite(charName) {
         FAVORITE_NAMES = FAVORITE_NAMES.filter(name => name !== charName);
         localStorage.setItem('favoriteCharacters', JSON.stringify(FAVORITE_NAMES));
@@ -543,46 +605,6 @@
 
     function toggleTask(chrId, type, taskId, shared) { /* 이전과 동일 */ }
     
-    // === 4. 시간 표시 및 테마 로직 ===
-    function updateCurrentTime() {
-        const now = new Date();
-        const rawString = now.toLocaleString("ko-KR", { 
-            timeZone: "Asia/Seoul", 
-            year: 'numeric', 
-            month: '2-digit', 
-            day: '2-digit', 
-            weekday: 'short', 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            hour12: false 
-        });
-        
-        // YYYY. MM. DD. (DOW) HH:MM -> YYYY.MM. DD. (DOW) HH:MM
-        let finalFormattedTime = rawString.replace(/^(\d{4})\.\s(\d{2})\.\s/, (match, year, month) => {
-            return `${year}.${month}. `;
-        });
-        
-        document.getElementById('current-time-display').innerText = finalFormattedTime;
-    }
-
-    const getTheme = () => localStorage.getItem('theme') || 'dark';
-
-    function setTheme(theme) {
-        document.body.className = theme === 'dark' ? 'dark-mode' : 'light-mode';
-        localStorage.setItem('theme', theme);
-        updateThemeToggleText(theme);
-    }
-    
-    function toggleTheme() {
-        const currentTheme = getTheme();
-        setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-    }
-
-    function updateThemeToggleText(theme) {
-        const button = document.getElementById('theme-toggle');
-        button.innerText = theme === 'dark' ? '☀️ 낮 모드' : '🌙 밤 모드';
-    }
-
     // === 5. 화면 렌더링 ===
 
     function createCharButton(charName, isFavorite = false) {
@@ -598,14 +620,15 @@
         button.setAttribute('data-char-name', char.name);
         button.onclick = () => selectCharacter(char.id);
         
-        // 캐릭터별 색상 적용 (활성화 시)
         if (char.id == currentChrId) {
             button.style.backgroundColor = charColor;
             button.style.color = charTextColor;
             button.style.fontWeight = 'bold';
             button.style.boxShadow = `0 2px 5px var(--shadow-color)`;
+            button.onmouseover = null;
+            button.onmouseout = null;
         } else {
-             // 비활성화 상태에서 마우스 오버 시 고유 색상 적용
+             // 마우스 오버 시 고유 색상 적용
             button.onmouseover = function() {
                 this.style.backgroundColor = charColor;
                 this.style.color = charTextColor;
@@ -618,24 +641,19 @@
             };
         }
 
-        // 즐겨찾기 버튼인 경우 우클릭 메뉴 추가
         if (isFavorite) {
-            button.ondblclick = (e) => { // 더블 클릭으로 즐겨찾기 제거
+            button.title = "더블 클릭 또는 드래그하여 제거, 드래그 앤 드롭으로 순서 변경";
+            button.ondblclick = (e) => { 
                 e.preventDefault();
                 removeFavorite(char.name);
             };
-            button.title = "더블 클릭하여 즐겨찾기에서 제거";
         }
 
-        // DND 속성
         button.setAttribute('draggable', true);
         button.addEventListener('dragstart', handleDragStart);
         button.addEventListener('dragover', handleDragOver);
         button.addEventListener('dragleave', handleDragLeave);
         button.addEventListener('dragend', handleDragEnd);
-        if (!isFavorite) {
-            button.addEventListener('drop', handleDrop);
-        }
 
         return button;
     }
@@ -643,29 +661,29 @@
 
     function renderCharacterSelector() {
         const allSelector = document.getElementById('character-selector');
-        const favSelector = document.getElementById('favorite-selector');
-        allSelector.innerHTML = '';
-        favSelector.innerHTML = '';
-
-        // 1. 즐겨찾기 렌더링
-        const unfavoritedNames = new Set(CHARACTER_NAMES.filter(name => !FAVORITE_NAMES.includes(name)));
+        const favList = document.getElementById('favorite-list');
         
+        allSelector.innerHTML = '';
+        favList.innerHTML = '';
+
+        // 1. 즐겨찾기 리스트 렌더링 (사이드바)
         const renderedFavorites = FAVORITE_NAMES.map(name => createCharButton(name, true)).filter(Boolean);
         
         if (renderedFavorites.length > 0) {
-            renderedFavorites.forEach(btn => favSelector.appendChild(btn));
-            favSelector.querySelector('.favorite-placeholder')?.remove();
+            renderedFavorites.forEach(btn => favList.appendChild(btn));
         } else {
-            favSelector.innerHTML = '<span class="favorite-placeholder">여기에 자주 사용하는 캐릭터를 드래그하세요.</span>';
+            favList.innerHTML = '<span class="favorite-list-placeholder">캐릭터를 여기에 드래그하세요.</span>';
         }
 
 
-        // 2. 모든 캐릭터 렌더링 (즐겨찾기에 없는 캐릭터만)
-        const allCharacterOrder = [...FAVORITE_NAMES.filter(name => CHARACTER_NAMES.includes(name)), ...Array.from(unfavoritedNames)].filter(name => CHARACTER_NAMES.includes(name));
+        // 2. 모든 캐릭터 렌더링 (상단)
+        const allCharacterOrder = CHARACTER_NAMES;
         
         allCharacterOrder.forEach(name => {
             const button = createCharButton(name, false);
             if (button) {
+                // 즐겨찾기에 있는 캐릭터는 모든 캐릭터 목록에서는 순서 변경 드롭 대상이 아닙니다.
+                // 하지만 클릭 및 드래그는 가능해야 합니다.
                 allSelector.appendChild(button);
             }
         });
@@ -748,6 +766,7 @@
     }
     
     function render() {
+        // initializeData() 내에서 데이터 로드 및 리셋 후 renderCharacterSelector()와 renderTaskList()가 호출됩니다.
         initializeData();
         updateCurrentTime();
     }
