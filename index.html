@@ -345,6 +345,23 @@
             background-color: var(--progress-done);
             transition: width 0.3s;
         }
+        
+        /* === 9. 푸터 스타일 추가 === */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85em;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        .footer-credit {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
 
 
         /* 모바일 반응형 */
@@ -426,7 +443,8 @@
     </div>
 
     <div class="footer">
-        데이터는 브라우저에 자동 저장됩니다. (기기 간 연동 X)
+        <div>데이터는 브라우저에 자동 저장됩니다. (기기 간 연동 X)</div>
+        <div class="footer-credit">Made by 깡</div>
     </div>
 </div>
 
