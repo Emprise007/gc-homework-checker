@@ -82,14 +82,30 @@
             color: var(--text-color);
         }
 
-        h2 { 
-            border-bottom: 2px solid var(--border-color); 
-            padding-bottom: 8px; 
-            margin-top: 35px; 
+        /* 캐릭터 선택 섹션 제목 */
+        .char-select-title-group {
+            text-align: center;
+            margin-top: 35px;
+            margin-bottom: 10px;
+        }
+
+        .char-select-title-group h2 { 
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-top: 0; 
             font-size: 1.5em; 
             color: var(--text-color); 
-            text-align: center;
         }
+
+        .char-select-info {
+            display: block;
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9em;
+            margin-top: -15px;
+            margin-bottom: 15px;
+        }
+
         h3 { color: var(--text-color); margin-top: 15px; margin-bottom: 10px; font-size: 1.1em; }
         
         /* === 3. 모드 토글 버튼 === */
@@ -127,19 +143,9 @@
             user-select: none;
         }
         .char-btn:hover { 
-            /* 기본 호버 색상 */
             background-color: var(--accent-color); 
             color: white; 
         }
-
-        /* 캐릭터별 활성화 색상 (JavaScript에서 직접 style로 주입됨)
-        .char-btn.active { 
-            background-color: var(--char-color);
-            color: var(--char-text-color);
-            font-weight: bold; 
-            box-shadow: 0 2px 5px var(--shadow-color);
-        }
-        */
         
         .char-btn.dragging {
             opacity: 0.5;
@@ -230,7 +236,10 @@
     </div>
 
 
-    <h2>캐릭터 선택 (드래그 앤 드롭으로 순서 변경 가능)</h2>
+    <div class="char-select-title-group">
+        <h2>캐릭터 선택</h2>
+        <span class="char-select-info">(드래그 앤 드롭으로 순서 변경 가능)</span>
+    </div>
     <div id="character-selector"></div>
     
     <h2 id="current-char-name"></h2>
@@ -320,19 +329,16 @@
     
     // 색상 밝기를 기반으로 텍스트 색상을 결정하는 함수 (White/Black)
     function getTextColor(hexColor) {
-        // Hex를 RGB로 변환
         const r = parseInt(hexColor.substring(1, 3), 16);
         const g = parseInt(hexColor.substring(3, 5), 16);
         const b = parseInt(hexColor.substring(5, 7), 16);
         
-        // 밝기 계산 (ITU-R BT.709 기준)
         const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
         
-        // 밝기가 0.5 이상이면 어두운 텍스트, 아니면 밝은 텍스트
         return luminance > 0.5 ? '#000000' : '#ffffff';
     }
 
-    // === 3. 데이터 로직 (이전과 동일) ===
+    // === 3. 데이터 로직 ===
     
     const getTaskMaxCount = (taskId) => {
         let item = DUNGEON_DATA.daily.find(d => d.id === taskId);
@@ -358,6 +364,7 @@
     };
 
     function initializeData() {
+        // 1. 캐릭터 순서 불러오기
         const savedOrder = localStorage.getItem('characterOrder');
         if (savedOrder) {
             const savedNames = JSON.parse(savedOrder);
@@ -365,6 +372,7 @@
             CHARACTER_NAMES = [...savedNames, ...newNames];
         }
         
+        // 2. 캐릭터 데이터 불러오기/생성 및 갱신
         const savedData = localStorage.getItem('gc_characters');
         const lastReset = localStorage.getItem('lastResetTime');
 
@@ -386,8 +394,25 @@
             
             const updatedChar = { ...char };
             
-            // 데이터 구조 갱신 로직 (생략된 부분은 기존과 동일하게 유지)
-            // ... (생략)
+            // 일일 숙제 갱신
+            updatedChar.dailyTasks = updatedChar.dailyTasks || {};
+            DUNGEON_DATA.daily.filter(d => !d.shared).forEach(d => {
+                const savedTask = char.dailyTasks ? char.dailyTasks[d.id] : null;
+                updatedChar.dailyTasks[d.id] = {
+                    completed: savedTask ? (savedTask.completed || 0) : 0,
+                    max: d.max
+                };
+            });
+            
+            // 주간 숙제 갱신
+            updatedChar.weeklyTasks = updatedChar.weeklyTasks || {};
+            DUNGEON_DATA.weekly.filter(d => !d.shared).forEach(d => {
+                const savedTask = char.weeklyTasks ? char.weeklyTasks[d.id] : null;
+                updatedChar.weeklyTasks[d.id] = {
+                    completed: savedTask ? (savedTask.completed || 0) : 0,
+                    max: d.max
+                };
+            });
             
             return updatedChar;
         });
@@ -396,9 +421,10 @@
         currentChrId = localStorage.getItem('currentChrId') || (characters.length > 0 ? characters[0].id : null);
         
         checkAndApplyReset(characters, lastReset);
+        // initializeData가 끝난 후 바로 render를 호출하여 UI 상태를 동기화합니다.
+        renderCharacterSelector(); 
+        renderTaskList();
     }
-    
-    // reset/dnd/toggleTask 함수는 로직 변경이 없으므로 생략하고 최종 코드에 포함
     
     function checkAndApplyReset(currentChars, lastResetTime) {
         const now = new Date();
@@ -454,6 +480,7 @@
         }
     }
     
+    // DND 로직 (이전과 동일)
     function handleDragStart(e) {
         draggedElement = e.target;
         e.dataTransfer.effectAllowed = 'move';
@@ -502,6 +529,13 @@
         document.getElementById('character-selector').querySelectorAll('.char-btn').forEach(btn => btn.classList.remove('drag-over'));
     }
 
+    // 액션 핸들러
+    function selectCharacter(id) {
+        currentChrId = id;
+        localStorage.setItem('currentChrId', id);
+        render(); // 캐릭터 선택 시 UI 전체 렌더링
+    }
+
     function toggleTask(chrId, type, taskId, shared) {
         const item = DUNGEON_DATA[type].find(d => d.id === taskId);
         
@@ -525,7 +559,7 @@
         render();
     }
     
-    // === 4. 시간 표시 및 테마 로직 ===
+    // === 4. 시간 표시 및 테마 로직 (이전과 동일) ===
     function updateCurrentTime() {
         const now = new Date();
         const kstString = now.toLocaleString("ko-KR", { timeZone: "Asia/Seoul", year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false });
@@ -560,7 +594,7 @@
         selector.innerHTML = '';
 
         characters.forEach(char => {
-            const charColor = CHAR_COLORS[char.name] || '#808080'; // 기본 회색
+            const charColor = CHAR_COLORS[char.name] || '#808080'; 
             const charTextColor = getTextColor(charColor);
 
             const button = document.createElement('button');
@@ -639,14 +673,14 @@
                 label.innerText = item.name;
                 labelGroup.appendChild(label);
                 
-                if (item.sub) { // 공허 던전 요일 정보
+                if (item.sub) { 
                     const subLabel = document.createElement('span');
                     subLabel.className = 'sub-info';
                     subLabel.innerText = item.sub;
                     labelGroup.appendChild(subLabel);
                 }
 
-                if (isShared) { // 계정 공유 태그
+                if (isShared) { 
                     const tag = document.createElement('span');
                     tag.className = 'account-shared-tag';
                     tag.innerText = item.type === 'daily' ? '계정 공유 (일일)' : '계정 공유 (주간)';
@@ -665,19 +699,24 @@
     }
     
     function render() {
+        // initializeData()에서 이미 renderCharacterSelector()와 renderTaskList()를 호출하도록 수정하여,
+        // 여기서 다시 호출할 필요가 없습니다. 다만, 초기 로딩 시 한 번만 호출되도록 변경합니다.
+        // 주기적인 갱신(60초) 로직을 위해 updateCurrentTime()과 initializeData()는 그대로 둡니다.
+        // initializeData()가 render 역할을 일부 수행합니다.
         initializeData();
         updateCurrentTime();
-        renderCharacterSelector();
-        renderTaskList();
     }
 
     // === 6. 시작 및 주기적 체크 ===
     
     setTheme(getTheme()); 
-    render();
+    // 초기 로딩 시 render() 대신 initializeData()를 직접 호출하여 데이터 로드 및 UI 갱신을 시작합니다.
+    initializeData();
+    updateCurrentTime();
     
-    // 1분마다 전체 초기화 체크 및 1초마다 현재 시간 업데이트
-    setInterval(render, 60000); 
+    // 1분마다 전체 초기화 체크 및 UI 갱신 (initializeData 호출로 render 역할 포함)
+    setInterval(initializeData, 60000); 
+    // 1초마다 현재 시간 업데이트
     setInterval(updateCurrentTime, 1000); 
 
 </script>
