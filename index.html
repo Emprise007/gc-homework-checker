@@ -298,6 +298,7 @@
             align-items: center; 
             margin-left: 10px; 
             flex-wrap: wrap; 
+            flex-grow: 1; /* 이름이 길 경우 나머지 공간을 차지하도록 설정 */
         }
         
         /* 스티커 스타일 */
@@ -317,7 +318,24 @@
             background-color: #ffddff; 
             color: #800080;
         }
-
+        
+        /* 일괄 체크박스 컨테이너 */
+        .all-char-check-container {
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* 오른쪽으로 밀어내기 */
+            padding-left: 10px;
+        }
+        
+        .all-char-check-container label {
+            font-size: 0.8em;
+            color: var(--text-color);
+            margin-right: 5px;
+            white-space: nowrap;
+            opacity: 0.8;
+            cursor: pointer;
+        }
+        
         /* 캐릭터별 완료율 표시 영역 */
         #daily-stats-display, #weekly-stats-display {
             padding: 10px 0;
@@ -388,6 +406,10 @@
             #favorite-list .char-btn {
                 flex: 1 1 calc(25% - 7.5px);
                 max-width: calc(25% - 7.5px);
+            }
+            /* 모바일에서 일괄 체크박스 텍스트 숨기기 */
+            .all-char-check-container label {
+                display: none;
             }
         }
     </style>
@@ -862,7 +884,39 @@
         localStorage.setItem('currentChrId', id);
         render(); 
     }
+    
+    /**
+     * 특정 숙제를 모든 캐릭터에 대해 일괄적으로 완료/미완료 처리
+     * @param {string} type 'daily' 또는 'weekly'
+     * @param {string} taskId 숙제 ID
+     * @param {boolean} currentStatus 현재 상태 (true면 완료 처리, false면 미완료 처리)
+     */
+    function toggleAllTasks(type, taskId, currentStatus) {
+        const item = DUNGEON_DATA[type].find(d => d.id === taskId);
+        if (!item || item.shared) return; // 계정 공유 숙제는 일괄 처리에서 제외
 
+        // 토글할 새로운 완료 횟수 (현재 상태가 false(모두 미완료)이면 최대치로, 아니면 0으로)
+        const newCount = currentStatus ? item.max : 0; 
+        
+        characters.forEach(char => {
+            // 해당 캐릭터의 숙제 상태를 일괄 변경
+            char[`${type}Tasks`][taskId] = { completed: newCount, max: item.max };
+        });
+
+        // 변경된 데이터 저장
+        localStorage.setItem('gc_characters', JSON.stringify(characters));
+        
+        // 통계 갱신 및 렌더링
+        characters.forEach(char => {
+            char.dailyStats = calculateCharStats(char, 'daily');
+            char.weeklyStats = calculateCharStats(char, 'weekly');
+            char.hasIncompleteDaily = char.dailyStats.totalCount > char.dailyStats.completedCount;
+            char.hasIncompleteWeekly = char.weeklyStats.totalCount > char.weeklyStats.completedCount;
+        });
+
+        render();
+    }
+    
     function toggleTask(chrId, type, taskId, shared) { 
         const item = DUNGEON_DATA[type].find(d => d.id === taskId);
         
@@ -1096,11 +1150,12 @@
                 const isCompleted = taskStatus.completed >= taskStatus.max;
                 
                 const div = document.createElement('div');
+                // 기존: 캐릭터별 체크 토글
                 div.onclick = () => toggleTask(currentCharacter.id, type, item.id, isShared);
-                // 던전 ID를 클래스로 추가
+                
                 div.className = `task-item bg-${item.id} ${isCompleted ? 'done' : ''}`;
 
-                // 체크박스
+                // --- 1. 캐릭터별 체크박스 ---
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = isCompleted;
@@ -1117,15 +1172,13 @@
                 label.innerText = item.name;
                 labelGroup.appendChild(label);
                 
-                // 계정 공유 스티커 추가
+                // 계정 공유/요일 스티커 추가
                 if (isShared) { 
                     const tag = document.createElement('span');
                     tag.className = 'task-tag shared'; 
                     tag.innerText = '계정 공유';
                     labelGroup.appendChild(tag);
                 }
-                
-                // 요일 스티커 추가 (주간 숙제에만 적용)
                 if (type === 'weekly' && item.sub) {
                     const tag = document.createElement('span');
                     tag.className = 'task-tag day'; 
@@ -1135,6 +1188,44 @@
 
                 div.appendChild(checkbox);
                 div.appendChild(labelGroup);
+                
+                
+                // --- 2. 일괄 체크박스 (계정 공유 숙제가 아닐 때만) ---
+                if (!isShared) {
+                    // 모든 캐릭터가 이 숙제를 완료했는지 확인
+                    const isAllCompleted = characters.every(char => {
+                        const charStatus = char[`${type}Tasks`][item.id] || { completed: 0, max: item.max };
+                        return charStatus.completed >= charStatus.max;
+                    });
+                    
+                    const allCharContainer = document.createElement('div');
+                    allCharContainer.className = 'all-char-check-container';
+                    
+                    const allCharCheckbox = document.createElement('input');
+                    allCharCheckbox.type = 'checkbox';
+                    allCharCheckbox.checked = isAllCompleted;
+                    allCharCheckbox.id = `all_char_${type}_${item.id}`;
+                    
+                    // 클릭 시 모든 캐릭터 상태 일괄 토글
+                    allCharCheckbox.onclick = (e) => {
+                        e.stopPropagation(); // task-item의 onclick 방지
+                        // 현재 체크 상태의 반대를 넘겨서 토글
+                        toggleAllTasks(type, item.id, !isAllCompleted); 
+                    };
+                    
+                    const allCharLabel = document.createElement('label');
+                    allCharLabel.htmlFor = allCharCheckbox.id;
+                    allCharLabel.innerText = '일괄 완료';
+                    
+                    allCharContainer.appendChild(allCharLabel);
+                    allCharContainer.appendChild(allCharCheckbox);
+                    
+                    div.appendChild(allCharContainer);
+                    
+                    // 일괄 체크박스에 의해 task-item 전체 클릭 시 로직이 꼬이는 것을 방지
+                    allCharContainer.onclick = (e) => e.stopPropagation();
+                }
+
 
                 container.appendChild(div);
             });
