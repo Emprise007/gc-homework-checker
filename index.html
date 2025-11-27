@@ -5,107 +5,183 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>그랜드체이스 숙제표</title>
     <style>
-        /* 기본 디자인 및 GC 테마 */
+        /* === 1. 다크/라이트 모드 변수 설정 === */
+        :root {
+            /* Light Mode Default */
+            --bg-main: #f4f7f6;
+            --bg-container: #ffffff;
+            --bg-item: #e8f0f3;
+            --text-color: #333333;
+            --accent-color: #3f72af;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --border-color: #ddd;
+            --shared-tag: #5cb85c;
+            --drag-bg: #c9e0ed;
+        }
+
+        /* Dark Mode (Class 적용 시) */
+        .dark-mode {
+            --bg-main: #1a1a2e;
+            --bg-container: #16213e;
+            --bg-item: #0f3460;
+            --text-color: #f0f0f0;
+            --accent-color: #e94560;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --border-color: #0f3460;
+            --shared-tag: #007bff;
+            --drag-bg: #3c1e70;
+        }
+
+        /* === 2. 기본 스타일 === */
         body { 
-            background-color: #1a1a2e; 
-            color: #fff; 
+            background-color: var(--bg-main); 
+            color: var(--text-color); 
             font-family: 'Malgun Gothic', sans-serif; 
             display: flex; 
             justify-content: center; 
             padding: 20px; 
             margin: 0; 
+            transition: background-color 0.3s, color 0.3s;
         }
         .container { 
             width: 100%; 
-            max-width: 1000px; /* 넓게 조정 */
-            background-color: #16213e; 
-            padding: 20px; 
+            max-width: 1100px; 
+            background-color: var(--bg-container); 
+            padding: 25px; 
             border-radius: 15px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
-        }
-        h1 { text-align: center; color: #e94560; margin-bottom: 5px; }
-        p.sub-title { text-align: center; color: #888; font-size: 0.9em; margin-top: 0; margin-bottom: 20px; }
-        h2 { 
-            border-bottom: 2px solid #0f3460; 
-            padding-bottom: 5px; 
-            margin-top: 30px; 
-            font-size: 1.2em; 
-            color: #aeb8c9; 
-            text-align: center;
+            box-shadow: 0 10px 30px var(--shadow-color); 
         }
         
-        /* 캐릭터 버튼 스타일 */
+        /* 제목 및 헤더 */
+        h1 { text-align: center; color: var(--accent-color); margin-bottom: 5px; font-size: 2em; }
+        p.sub-title { text-align: center; color: #888; font-size: 0.9em; margin-top: 0; margin-bottom: 25px; }
+        h2 { 
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 8px; 
+            margin-top: 35px; 
+            font-size: 1.5em; 
+            color: var(--accent-color); 
+            text-align: center;
+        }
+        h3 { color: var(--text-color); margin-top: 15px; margin-bottom: 10px; font-size: 1.1em; }
+        
+        /* === 3. 모드 토글 버튼 === */
+        #theme-toggle {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: var(--bg-item);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #theme-toggle:hover { background: var(--accent-color); color: white; }
+
+        /* === 4. 캐릭터 선택 버튼 (DND 적용) === */
         #character-selector { 
             display: flex; 
             flex-wrap: wrap; 
             justify-content: center; 
-            gap: 8px; 
-            margin-bottom: 20px; 
+            gap: 6px; 
+            margin-bottom: 25px; 
         }
         .char-btn { 
-            background-color: #0f3460; 
-            color: #fff; 
-            border: 1px solid #16213e; 
+            background-color: var(--bg-item); 
+            color: var(--text-color); 
+            border: 1px solid var(--border-color); 
             padding: 8px 12px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 0.9em; 
-            transition: background-color 0.2s, border-color 0.2s;
+            border-radius: 20px; 
+            cursor: grab; /* 드래그 가능 아이콘 */
+            font-size: 0.85em; 
+            transition: all 0.3s;
+            /* DND 관련 스타일 */
+            user-select: none;
         }
-        .char-btn:hover { background-color: #1a1a2e; }
-        .char-btn.active { background-color: #e94560; border-color: #fff; font-weight: bold; }
+        .char-btn:hover { background-color: var(--accent-color); color: white; }
+        .char-btn.active { 
+            background-color: var(--accent-color); 
+            color: white; 
+            font-weight: bold; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        /* 드래그 중인 아이템 스타일 */
+        .char-btn.dragging {
+            opacity: 0.5;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        /* 드롭될 위치 표시 */
+        .char-btn.drag-over {
+            border: 2px dashed var(--accent-color);
+            background-color: var(--drag-bg);
+        }
 
-        /* 좌우 분할 레이아웃 */
+        /* === 5. 숙제 목록 (좌우 분할) === */
         #task-view-container { 
             display: flex; 
-            gap: 20px; 
+            gap: 30px; 
             margin-top: 20px;
         }
         .task-column { 
             flex: 1; 
-            background-color: #0f1a35; 
-            padding: 15px; 
-            border-radius: 8px;
+            background-color: var(--bg-main); 
+            padding: 20px; 
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px var(--shadow-color);
         }
 
-        /* 숙제 목록 스타일 */
         .task-item { 
             display: flex; 
             align-items: center; 
-            background-color: #0f3460; 
-            margin-bottom: 8px; 
-            padding: 10px; 
-            border-radius: 6px; 
+            background-color: var(--bg-item); 
+            margin-bottom: 10px; 
+            padding: 12px; 
+            border-radius: 8px; 
             cursor: pointer; 
-            transition: 0.2s; 
-            font-size: 0.95em;
+            transition: all 0.3s; 
+            font-size: 1em;
+            justify-content: space-between;
         }
-        .task-item.done { opacity: 0.5; text-decoration: line-through; }
+        .task-item:hover { transform: translateY(-2px); box-shadow: 0 4px 8px var(--shadow-color); }
+        .task-item.done { opacity: 0.6; }
         
-        input[type="checkbox"] { transform: scale(1.1); margin-right: 15px; cursor: pointer; }
-        label { cursor: pointer; flex-grow: 1; font-weight: bold; }
+        .task-label-group { display: flex; align-items: center; }
+        .task-label { font-weight: bold; margin-right: 15px; }
         
+        /* 횟수 표시 */
+        .count-display {
+            font-size: 1em;
+            font-weight: bold;
+            color: var(--accent-color);
+            min-width: 40px;
+            text-align: right;
+        }
+        .count-display.completed { color: var(--shared-tag); }
+
         .account-shared-tag { 
-            font-size: 0.75em; 
-            background-color: #007bff; 
-            padding: 2px 6px; 
-            border-radius: 3px; 
+            font-size: 0.7em; 
+            background-color: var(--shared-tag); 
+            color: white; 
+            padding: 3px 6px; 
+            border-radius: 4px; 
             margin-left: 10px;
+            font-weight: normal;
         }
         
-        .reset-info { font-size: 0.8em; color: #e94560; margin-left: 5px; }
-        .footer { margin-top: 30px; text-align: center; font-size: 0.8em; color: #666; }
-        
+        /* 모바일 반응형 */
         @media (max-width: 768px) {
             #task-view-container {
-                flex-direction: column; /* 모바일에서는 위아래로 다시 배치 */
+                flex-direction: column; 
             }
+            .container { padding: 15px; }
+            #theme-toggle { top: 15px; right: 15px; padding: 6px 10px; font-size: 0.8em; }
         }
     </style>
 </head>
-<body>
-
-<div class="container">
+<body class="dark-mode"> <div class="container">
+    <button id="theme-toggle" onclick="toggleTheme()"></button>
     <h1>그랜드체이스 숙제표</h1>
     <p class="sub-title">일일: 매일 15:00 초기화 | 주간: 수요일 15:00 초기화 (KST)</p>
 
@@ -116,12 +192,12 @@
 
     <div id="task-view-container">
         <div class="task-column">
-            <h3 style="color: #aeb8c9;">📅 일일 숙제 (캐릭터별)</h3>
+            <h3>📅 일일 숙제 (캐릭터별)</h3>
             <div id="daily-list"></div>
         </div>
 
         <div class="task-column">
-            <h3 style="color: #aeb8c9;">⚔️ 주간/계정 공유 숙제</h3>
+            <h3>⚔️ 주간/계정 공유 숙제</h3>
             <div id="weekly-list"></div>
         </div>
     </div>
@@ -134,91 +210,124 @@
 <script>
     // === 1. 기본 데이터 설정 ===
 
-    // 24개 캐릭터 리스트
-    const CHARACTER_NAMES = [
+    // 24개 캐릭터 리스트 (순서 변경 시 이 배열이 업데이트됨)
+    let CHARACTER_NAMES = [
         '엘리시스', '리르', '아르메', '라스', '라이언', '로난', '에이미', '진', '지크하트', '마리', 
         '디오', '제로', '레이', '루퍼스', '베이가스', '린', '아신', '라임', '에델', '데카네', 
         '아이', '칼리아', '우노', '이리스'
     ];
-
-    // 던전 목록 (ID, 이름, 그리고 계정 공유 여부)
+    
+    // 던전 목록: max 속성으로 최대 횟수를 정의합니다.
     const DUNGEON_DATA = {
-        // 현상수배 (wanted) 제거
         daily: [
-            { id: 'berkas', name: '베르카스의 요새', shared: false },
-            { id: 'tower', name: '소멸의 탑', shared: false },
-            { id: 'void', name: '공허', shared: false },
-            { id: 'tero', name: '이세계: 테로카 공성전', shared: false },
-            { id: 'temple', name: '이세계: 시간의 사원', shared: false },
-            { id: 'kounat', name: '이세계: 코우나트 대폭발', shared: false },
+            { id: 'berkas', name: '베르카스의 요새', max: 1, shared: false },
+            { id: 'tower', name: '소멸의 탑', max: 3, shared: false }, // 3회 수정
+            { id: 'void', name: '공허', max: 2, type: 'weekly', shared: false }, // 공허 (Weekly, 2회)
+            { id: 'tero', name: '이세계: 테로카 공성전', max: 1, shared: false },
+            { id: 'temple', name: '이세계: 시간의 사원', max: 1, shared: false },
+            { id: 'kounat', name: '이세계: 코우나트 대폭발', max: 1, shared: false },
         ],
         weekly: [
-            { id: 'judge', name: '심판의 땅', type: 'weekly', shared: false },
-            { id: 'abyss', name: '심연의 길', type: 'weekly', shared: false },
-            { id: 'w_furnace', name: '지옥의 용광로', type: 'weekly', shared: false },
-            { id: 'w_sanctum', name: '파멸의 성소', type: 'weekly', shared: false },
-            { id: 'w_laby', name: '환영의 미궁', type: 'weekly', shared: false },
-            { id: 'corridor', name: '무한회랑', type: 'daily', shared: true } // 일일/계정 공유
+            { id: 'judge', name: '심판의 땅', max: 3, type: 'weekly', shared: false }, // 3회 수정
+            { id: 'abyss', name: '심연의 길', max: 1, type: 'weekly', shared: false },
+            { id: 'w_furnace', name: '지옥의 용광로', max: 3, type: 'weekly', shared: false },
+            { id: 'w_sanctum', name: '파멸의 성소', max: 3, type: 'weekly', shared: false },
+            { id: 'w_laby', name: '환영의 미궁', max: 5, type: 'weekly', shared: false },
+            { id: 'corridor', name: '무한회랑', max: 3, type: 'daily', shared: true } // 일일/계정 공유, 3회 수정
         ]
     };
 
-    let characters = []; // 전체 캐릭터 데이터
-    let currentChrId = null; // 현재 선택된 캐릭터 ID
+    let characters = []; 
+    let currentChrId = null; 
+    let draggedElement = null; // DND를 위한 전역 변수
 
     // === 2. 데이터 초기화/불러오기 ===
 
-    // 빈 체크리스트 생성
     const generateInitialTasks = (type) => {
         const tasks = {};
         DUNGEON_DATA[type].forEach(d => {
-            tasks[d.id] = false;
+            if (d.shared) return; 
+            tasks[d.id] = { completed: 0, max: d.max };
         });
         return tasks;
     };
-
-    // 로컬 스토리지에서 계정 공유 숙제(무한회랑) 상태를 가져옵니다.
-    const getAccountSharedTaskStatus = (id) => {
-        return localStorage.getItem(`shared_${id}`) === 'true';
+    
+    const getTaskMaxCount = (taskId) => {
+        const dailyItem = DUNGEON_DATA.daily.find(d => d.id === taskId);
+        if (dailyItem) return dailyItem.max;
+        const weeklyItem = DUNGEON_DATA.weekly.find(d => d.id === taskId);
+        if (weeklyItem) return weeklyItem.max;
+        return 1;
     };
 
-    // 로컬 스토리지에 계정 공유 숙제 상태를 저장합니다.
+    const getAccountSharedTaskStatus = (id) => {
+        const saved = localStorage.getItem(`shared_${id}`);
+        return saved ? JSON.parse(saved) : { completed: 0, max: getTaskMaxCount(id) };
+    };
+
     const setAccountSharedTaskStatus = (id, status) => {
-        localStorage.setItem(`shared_${id}`, status);
+        localStorage.setItem(`shared_${id}`, JSON.stringify(status));
     };
 
     function initializeData() {
+        // 1. 캐릭터 순서 불러오기
+        const savedOrder = localStorage.getItem('characterOrder');
+        if (savedOrder) {
+            CHARACTER_NAMES = JSON.parse(savedOrder);
+        }
+        
+        // 2. 캐릭터 데이터 불러오기/생성
         const savedData = localStorage.getItem('gc_characters');
         const lastReset = localStorage.getItem('lastResetTime');
 
+        // 기존 캐릭터 ID 목록
+        const existingIds = savedData ? JSON.parse(savedData).map(c => c.id) : [];
+        let nextId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
+
         if (savedData) {
             characters = JSON.parse(savedData);
-            // 새로운 던전 목록과 기존 목록을 비교하여 데이터 구조를 갱신합니다.
-            const allDailyIds = DUNGEON_DATA.daily.map(d => d.id);
-            const allWeeklyIds = DUNGEON_DATA.weekly.map(d => d.id);
+            
+            // 기존 캐릭터 맵 생성 (ID 기준)
+            const charMap = new Map(characters.map(c => [c.name, c]));
 
-            characters = characters.map(char => {
-                let updatedDaily = {};
-                let updatedWeekly = {};
+            // 순서 배열(CHARACTER_NAMES)에 맞춰 캐릭터 데이터 정렬/업데이트
+            characters = CHARACTER_NAMES.map(name => {
+                let char = charMap.get(name);
                 
-                // Daily Tasks 갱신
-                allDailyIds.forEach(id => {
-                    updatedDaily[id] = char.dailyTasks ? (char.dailyTasks[id] || false) : false;
+                if (!char) {
+                    // 순서에 새로운 캐릭터가 추가되었을 경우 (업데이트 대비)
+                    char = {
+                        id: nextId++,
+                        name: name,
+                        dailyTasks: generateInitialTasks('daily'),
+                        weeklyTasks: generateInitialTasks('weekly')
+                    };
+                }
+                
+                // 데이터 구조 갱신 (max count 반영 등)
+                const updatedChar = { ...char };
+                
+                DUNGEON_DATA.daily.forEach(d => {
+                    const savedTask = char.dailyTasks ? char.dailyTasks[d.id] : null;
+                    updatedChar.dailyTasks[d.id] = {
+                        completed: savedTask ? (savedTask.completed || 0) : 0,
+                        max: d.max
+                    };
                 });
                 
-                // Weekly Tasks 갱신 (무한회랑은 공유 숙제로 따로 관리되므로 제외)
-                allWeeklyIds.filter(id => id !== 'corridor').forEach(id => {
-                    updatedWeekly[id] = char.weeklyTasks ? (char.weeklyTasks[id] || false) : false;
+                DUNGEON_DATA.weekly.filter(d => !d.shared).forEach(d => {
+                    const savedTask = char.weeklyTasks ? char.weeklyTasks[d.id] : null;
+                    updatedChar.weeklyTasks[d.id] = {
+                        completed: savedTask ? (savedTask.completed || 0) : 0,
+                        max: d.max
+                    };
                 });
-
-                return {
-                    ...char,
-                    dailyTasks: updatedDaily,
-                    weeklyTasks: updatedWeekly
-                };
+                
+                return updatedChar;
             });
-
+            
         } else {
-            // 로컬에 데이터가 없으면 24개 캐릭터 생성
+            // 로컬에 데이터가 없으면 초기 24개 캐릭터 생성
             characters = CHARACTER_NAMES.map((name, index) => ({
                 id: index + 1,
                 name: name,
@@ -228,12 +337,12 @@
         }
         
         localStorage.setItem('gc_characters', JSON.stringify(characters));
-        currentChrId = localStorage.getItem('currentChrId') || characters[0].id;
+        currentChrId = localStorage.getItem('currentChrId') || (characters.length > 0 ? characters[0].id : null);
         
         checkAndApplyReset(characters, lastReset);
     }
 
-    // === 3. 초기화 로직 (핵심) ===
+    // === 3. 초기화 로직 (이전과 동일) ===
     function checkAndApplyReset(currentChars, lastResetTime) {
         const now = new Date();
         const kstNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
@@ -257,23 +366,28 @@
         if (lastCheckTime < weeklyResetPoint.getTime()) { isWeeklyReset = true; }
 
         if (isDailyReset || isWeeklyReset) {
-            console.log(`Resetting: Daily=${isDailyReset}, Weekly=${isWeeklyReset}`);
             
             characters = currentChars.map(char => {
                 let newChar = {...char};
                 
-                // 1. 캐릭터별 숙제 초기화
-                if (isDailyReset) newChar.dailyTasks = generateInitialTasks('daily');
-                // 주간 초기화 시 주간 숙제만 초기화
-                if (isWeeklyReset) newChar.weeklyTasks = generateInitialTasks('weekly');
+                if (isDailyReset) {
+                    DUNGEON_DATA.daily.forEach(d => {
+                        newChar.dailyTasks[d.id].completed = 0;
+                    });
+                }
+                
+                if (isWeeklyReset) {
+                    DUNGEON_DATA.weekly.filter(d => !d.shared).forEach(d => {
+                        newChar.weeklyTasks[d.id].completed = 0;
+                    });
+                }
                 return newChar;
             });
             
-            // 2. 계정 공유 숙제 초기화 (무한회랑)
             if (isDailyReset) {
                 const infiniteCorridor = DUNGEON_DATA.weekly.find(d => d.id === 'corridor');
                 if (infiniteCorridor && infiniteCorridor.shared) {
-                    setAccountSharedTaskStatus('corridor', false);
+                    setAccountSharedTaskStatus('corridor', { completed: 0, max: infiniteCorridor.max });
                 }
             }
             
@@ -282,7 +396,71 @@
         }
     }
 
-    // === 4. 액션 핸들러 ===
+    // === 4. DND 로직 ===
+    
+    function handleDragStart(e) {
+        draggedElement = e.target;
+        e.dataTransfer.effectAllowed = 'move';
+        e.target.classList.add('dragging');
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault(); 
+        e.dataTransfer.dropEffect = 'move';
+        const target = e.target.closest('.char-btn');
+        if (target && target !== draggedElement) {
+            // 드롭될 위치 시각화
+            const selector = document.getElementById('character-selector');
+            const children = Array.from(selector.children);
+            children.forEach(child => child.classList.remove('drag-over'));
+            
+            // 드래그된 요소가 타겟 요소 앞에 위치할지 뒤에 위치할지 결정
+            const rect = target.getBoundingClientRect();
+            const isBefore = e.clientX < rect.left + rect.width / 2;
+            
+            if (isBefore) {
+                target.classList.add('drag-over');
+            } else {
+                target.classList.add('drag-over');
+            }
+        }
+    }
+
+    function handleDragLeave(e) {
+        e.target.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const target = e.target.closest('.char-btn');
+        if (draggedElement && target && draggedElement !== target) {
+            
+            const selector = document.getElementById('character-selector');
+            const children = Array.from(selector.children);
+            
+            const sourceIndex = children.indexOf(draggedElement);
+            const targetIndex = children.indexOf(target);
+
+            // 배열에서 순서 변경
+            const [removed] = CHARACTER_NAMES.splice(sourceIndex, 1);
+            CHARACTER_NAMES.splice(targetIndex, 0, removed);
+            
+            // 로컬 스토리지에 저장
+            localStorage.setItem('characterOrder', JSON.stringify(CHARACTER_NAMES));
+            
+            // UI 업데이트 및 데이터 재초기화 (순서 적용)
+            render();
+        }
+        children.forEach(child => child.classList.remove('drag-over'));
+    }
+
+    function handleDragEnd(e) {
+        e.target.classList.remove('dragging');
+        draggedElement = null;
+        document.getElementById('character-selector').querySelectorAll('.char-btn').forEach(btn => btn.classList.remove('drag-over'));
+    }
+
+    // === 5. 액션 핸들러 및 UI/UX 테마 로직 (이전과 동일) ===
 
     function selectCharacter(id) {
         currentChrId = id;
@@ -291,28 +469,47 @@
     }
 
     function toggleTask(chrId, type, taskId, shared) {
+        const item = DUNGEON_DATA[type].find(d => d.id === taskId);
+        
         if (shared) {
-            // 계정 공유 숙제 처리
-            const newStatus = !getAccountSharedTaskStatus(taskId);
-            setAccountSharedTaskStatus(taskId, newStatus);
+            const status = getAccountSharedTaskStatus(taskId);
+            const newCount = (status.completed + 1) % (item.max + 1); 
+            setAccountSharedTaskStatus(taskId, { completed: newCount, max: item.max });
         } else {
-            // 캐릭터별 숙제 처리
             const charIndex = characters.findIndex(c => c.id === chrId);
             if (charIndex === -1) return;
     
             const char = characters[charIndex];
-            const newStatus = !char[`${type}Tasks`][taskId];
-            char[`${type}Tasks`] = {
-                ...char[`${type}Tasks`],
-                [taskId]: newStatus
-            };
+            const currentCount = char[`${type}Tasks`][taskId].completed;
+            
+            const newCount = (currentCount + 1) % (item.max + 1);
+            
+            char[`${type}Tasks`][taskId].completed = newCount;
             localStorage.setItem('gc_characters', JSON.stringify(characters));
         }
 
         render();
     }
+    
+    const getTheme = () => localStorage.getItem('theme') || 'dark';
 
-    // === 5. 화면 렌더링 ===
+    function setTheme(theme) {
+        document.body.className = theme === 'dark' ? 'dark-mode' : 'light-mode';
+        localStorage.setItem('theme', theme);
+        updateThemeToggleText(theme);
+    }
+    
+    function toggleTheme() {
+        const currentTheme = getTheme();
+        setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+    function updateThemeToggleText(theme) {
+        const button = document.getElementById('theme-toggle');
+        button.innerText = theme === 'dark' ? '☀️ 낮 모드' : '🌙 밤 모드';
+    }
+
+    // === 6. 화면 렌더링 ===
 
     function renderCharacterSelector() {
         const selector = document.getElementById('character-selector');
@@ -323,12 +520,22 @@
             button.className = `char-btn ${char.id == currentChrId ? 'active' : ''}`;
             button.innerText = char.name;
             button.onclick = () => selectCharacter(char.id);
+            
+            // DND 속성 추가
+            button.setAttribute('draggable', true);
+            button.addEventListener('dragstart', handleDragStart);
+            button.addEventListener('dragover', handleDragOver);
+            button.addEventListener('dragleave', handleDragLeave);
+            button.addEventListener('drop', handleDrop);
+            button.addEventListener('dragend', handleDragEnd);
+
             selector.appendChild(button);
         });
     }
 
     function renderTaskList() {
         const currentCharacter = characters.find(c => c.id == currentChrId);
+        
         if (!currentCharacter) {
             document.getElementById('current-char-name').innerText = '캐릭터를 선택해주세요.';
             document.getElementById('task-view-container').style.display = 'none';
@@ -346,38 +553,58 @@
             
             listToRender.forEach(item => {
                 const isShared = item.shared || false;
-                let isChecked;
+                let taskStatus;
 
                 if (isShared) {
-                    isChecked = getAccountSharedTaskStatus(item.id);
+                    taskStatus = getAccountSharedTaskStatus(item.id);
                 } else {
-                    isChecked = currentCharacter[`${type}Tasks`][item.id] || false;
+                    taskStatus = currentCharacter[`${type}Tasks`][item.id] || { completed: 0, max: item.max };
                 }
+
+                const isCompleted = taskStatus.completed >= taskStatus.max;
                 
                 const div = document.createElement('div');
                 div.onclick = () => toggleTask(currentCharacter.id, type, item.id, isShared);
-                div.className = `task-item ${isChecked ? 'done' : ''}`;
+                div.className = `task-item ${isCompleted ? 'done' : ''}`;
 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.checked = isChecked;
+                checkbox.checked = isCompleted;
                 checkbox.onclick = (e) => {
                     e.stopPropagation(); 
                     toggleTask(currentCharacter.id, type, item.id, isShared);
                 };
 
-                const label = document.createElement('label');
+                const labelGroup = document.createElement('div');
+                labelGroup.className = 'task-label-group';
+                
+                const label = document.createElement('span');
+                label.className = 'task-label';
                 label.innerText = item.name;
                 
+                labelGroup.appendChild(label);
+
                 if (isShared) {
                     const tag = document.createElement('span');
                     tag.className = 'account-shared-tag';
-                    tag.innerText = '계정 공유';
-                    label.appendChild(tag);
+                    tag.innerText = item.type === 'daily' ? '계정 공유 (일일)' : '계정 공유 (주간)';
+                    labelGroup.appendChild(tag);
                 }
+                
+                const countDisplay = document.createElement('span');
+                countDisplay.className = `count-display ${isCompleted ? 'completed' : ''}`;
+                countDisplay.innerText = `${taskStatus.completed}/${taskStatus.max}`;
 
-                div.appendChild(checkbox);
-                div.appendChild(label);
+                const leftContainer = document.createElement('div');
+                leftContainer.style.display = 'flex';
+                leftContainer.style.alignItems = 'center';
+                leftContainer.appendChild(checkbox);
+                leftContainer.appendChild(labelGroup);
+                
+                div.innerHTML = '';
+                div.appendChild(leftContainer);
+                div.appendChild(countDisplay);
+
                 container.appendChild(div);
             });
         };
@@ -392,8 +619,9 @@
         renderTaskList();
     }
 
-    // === 6. 시작 및 주기적 체크 ===
+    // === 7. 시작 및 주기적 체크 ===
     
+    setTheme(getTheme()); 
     render();
     
     setInterval(render, 60000); 
