@@ -107,13 +107,14 @@
             border-color: var(--accent-color);
         }
 
-        /* === 4. 모든 캐릭터 선택 영역 (상단) === */
+        /* === 4. 모든 캐릭터 선택 영역 (상단) - 균등 배치 핵심 수정 === */
         #character-selector { 
             display: flex; 
             flex-wrap: wrap; 
-            justify-content: center; 
+            justify-content: flex-start; /* 좌측 정렬 */
             gap: 6px; 
             margin-bottom: 25px; 
+            width: 100%; /* 전체 너비 사용 */
         }
         
         /* === 5. 숙제 목록 및 사이드바 컨테이너 === */
@@ -139,10 +140,10 @@
         #favorite-list { display: flex; flex-direction: column; gap: 10px; min-height: 100px; }
         .favorite-list-placeholder { color: var(--text-color); opacity: 0.5; font-style: italic; font-size: 0.9em; text-align: center; padding: 10px; }
         
-        /* 일일/주간 숙제 컨테이너 (사이드바 옆의 나머지 공간) */
+        /* 일일/주간 숙제 컨테이너 */
         #task-view-container { 
             flex: 1; 
-            display: flex; /* 내부의 일일/주간 컬럼을 나란히 배치 */
+            display: flex; 
             gap: 30px; 
         }
         
@@ -155,29 +156,44 @@
             box-shadow: inset 0 0 10px var(--shadow-color); 
         }
 
-        /* === 6. 캐릭터 버튼 공통 스타일 === */
+        /* === 6. 캐릭터 버튼 공통 스타일 - 균등 배치 핵심 수정 === */
         .char-btn { 
+            /* 12개 균등 배치를 위한 Flexbox 설정 */
+            flex: 1 1 calc(100% / 12 - 6px); /* 100%를 12등분하고 gap 6px 반영 */
+            min-width: 0; /* flex item의 기본 너비 오버플로우 방지 */
+            max-width: calc(100% / 12 - 6px);
+            text-align: center; /* 텍스트 중앙 정렬 */
+            
+            /* 기존 스타일 유지 */
             background-color: var(--bg-item); 
             color: var(--text-color); 
             border: 1px solid var(--border-color); 
-            padding: 8px 12px; 
+            padding: 8px 0px; /* 좌우 패딩 제거 (균등 너비 확보), 상하 패딩 유지 */
             border-radius: 20px; 
             cursor: grab; 
             font-size: 0.85em; 
             transition: all 0.2s ease-in-out; 
             user-select: none;
             position: relative; 
+            white-space: nowrap; /* 글자가 길어도 한 줄 유지 (text-overflow는 필요에 따라 추가) */
         }
+        /* 이름이 길어질 경우 말줄임표 처리 (선택 사항) */
+        .char-btn span {
+             display: block;
+             overflow: hidden;
+             text-overflow: ellipsis;
+        }
+
         .char-btn.dragging { opacity: 0.5; box-shadow: 0 5px 15px var(--shadow-color); }
         .char-btn.drag-over { border: 2px dashed var(--accent-color); background-color: var(--drag-bg); }
         
         /* 캐릭터 버튼 내 프로그레스 바 */
         .progress-bar-container {
             height: 3px;
-            width: 100%;
+            width: 90%; /* 버튼 중앙에 맞추기 위해 너비 조정 */
+            margin: 5px auto 0 auto; /* 중앙 정렬 */
             background-color: var(--progress-bar-bg);
             border-radius: 2px;
-            margin-top: 5px;
             overflow: hidden;
         }
         .progress-bar {
@@ -187,8 +203,51 @@
         }
         
         /* === 7. 숙제 아이템 및 통계 영역 === */
-        .task-item { display: flex; align-items: center; background-color: var(--bg-item); margin-bottom: 10px; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 1em; justify-content: flex-start; }
-        .task-item.done { opacity: 0.6; }
+        .task-item { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            padding: 12px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            font-size: 1em; 
+            justify-content: flex-start; 
+            
+            /* 배경 이미지 설정 (배경 이미지 비활성화를 위해 주석 처리) */
+            /* background-size: cover; */
+            /* background-position: center; */
+            /* background-repeat: no-repeat; */
+            /* position: relative; */
+            /* overflow: hidden; */
+            /* color: #ffffff; */ /* 텍스트 색상 다시 테마 기본으로 */
+            background-color: var(--bg-item);
+            color: var(--text-color); 
+        }
+        
+        /* 그라데이션 오버레이 제거 (요청에 따라) */
+        .task-item::before {
+            content: none;
+        }
+        
+        /* 완료된 아이템 오버레이 (흐리게 및 어둡게) */
+        .task-item.done { 
+             opacity: 0.6;
+             background-color: var(--bg-item);
+        }
+        
+        /* 내부 콘텐츠가 오버레이 위로 오도록 설정 */
+        .task-item > * {
+            z-index: 2; 
+        }
+        
+        /* 체크박스 색상 조정 (다크 모드 기준) */
+        .task-item input[type="checkbox"] {
+             filter: none; /* 필터 제거 (배경 이미지 없으므로 기본 색상 유지) */
+             margin-right: 5px;
+             /* 다크 모드일 때만 인버트 적용 */
+             /* .dark-mode .task-item input[type="checkbox"] { filter: invert(0.8); } */
+        }
         
         /* 레이블 그룹 */
         .task-label-group { 
@@ -202,8 +261,8 @@
         .task-tag {
             font-size: 0.7em;
             font-weight: bold;
-            color: white;
-            background-color: var(--shared-tag); 
+            color: var(--text-color); /* 테마 색상으로 복구 */
+            background-color: var(--sidebar-bg); /* 테마 색상으로 복구 */
             padding: 2px 6px;
             border-radius: 10px;
             margin-left: 8px;
@@ -212,21 +271,37 @@
         
         /* 요일 스티커 전용 색상 */
         .task-tag.day {
-            background-color: #9c27b0; 
+            background-color: #ffddff; /* 밝은 자주색 배경 */
+            color: #800080;
         }
 
-        /* 캐릭터별 완료율 표시 영역 (새로운 위치에 맞게 스타일 조정) */
+        /* 던전별 이미지 클래스 정의 (요청에 따라 유지, 배경 이미지는 .task-item에서 비활성화됨) */
+        .bg-berkas { }
+        .bg-tower { }
+        .bg-tero { }
+        .bg-temple { }
+        .bg-kounat { }
+        .bg-corridor { } 
+        .bg-judge { }
+        .bg-abyss { }
+        .bg-void_mon, .bg-void_wed, .bg-void_fri { } 
+        .bg-w_furnace { }
+        .bg-w_sanctum { }
+        .bg-w_laby { }
+        
+        /* 캐릭터별 완료율 표시 영역 */
         #daily-stats-display, #weekly-stats-display {
             padding: 10px 0;
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 15px;
-            margin-top: -10px; /* 제목과의 간격 조정 */
+            margin-top: -10px; 
         }
         .stat-item {
             display: flex;
             justify-content: space-between;
             margin-bottom: 5px;
             font-size: 0.9em;
+            color: var(--text-color); 
         }
         .stat-bar-container {
             flex-grow: 1;
@@ -243,7 +318,7 @@
         }
 
 
-        /* 모바일 반응형 */
+        /* 모바일 반응형 (12개 균등 배치가 깨질 때, 버튼 크기를 조정) */
         @media (max-width: 950px) {
             #main-content-area { flex-direction: column; }
             #favorite-sidebar { width: 100%; min-width: auto; }
@@ -253,6 +328,14 @@
             #theme-toggle { top: 15px; right: 15px; padding: 6px 10px; font-size: 0.8em; }
             .info-header { flex-direction: column; align-items: flex-start; gap: 5px; }
             #filter-stats-container { flex-direction: column; align-items: flex-start; gap: 10px; }
+            
+            /* 모바일에서 버튼 크기 조정 (예: 6개씩 배치) */
+            #character-selector { justify-content: space-around; }
+            .char-btn {
+                 flex: 1 1 calc(100% / 6 - 6px);
+                 max-width: calc(100% / 6 - 6px);
+                 font-size: 0.75em;
+            }
         }
     </style>
 </head>
@@ -296,12 +379,14 @@
         <div id="task-view-container">
             
             <div class="task-column-wrapper">
-                <h3>📅 일일 숙제</h3> <div id="daily-stats-display"></div> 
+                <h3>📅 일일 숙제</h3>
+                <div id="daily-stats-display"></div> 
                 <div id="daily-list"></div>
             </div>
 
             <div class="task-column-wrapper">
-                <h3>⚔️ 주간 숙제</h3> <div id="weekly-stats-display"></div>
+                <h3>⚔️ 주간 숙제</h3>
+                <div id="weekly-stats-display"></div>
                 <div id="weekly-list"></div>
             </div>
         </div>
@@ -470,7 +555,7 @@
     }
     
     function checkAndApplyReset(currentChars, lastResetTime) { 
-        // 기존과 동일한 초기화 로직
+        // 기존과 동일한 초기화 로직 (생략)
         const now = new Date();
         const dailyResetHour = 15;
         const weeklyResetDay = 3; // 수요일 (0:일요일, 1:월요일, ..., 3:수요일)
@@ -911,8 +996,8 @@
         if (!currentCharacter) {
             document.getElementById('current-char-name').innerText = '캐릭터를 선택해주세요.';
             document.getElementById('task-view-container').style.display = 'none';
-            document.getElementById('daily-stats-display').innerHTML = ''; // 안전하게 초기화
-            document.getElementById('weekly-stats-display').innerHTML = ''; // 안전하게 초기화
+            document.getElementById('daily-stats-display').innerHTML = ''; 
+            document.getElementById('weekly-stats-display').innerHTML = ''; 
             return;
         }
         
@@ -959,7 +1044,8 @@
                 
                 const div = document.createElement('div');
                 div.onclick = () => toggleTask(currentCharacter.id, type, item.id, isShared);
-                div.className = `task-item ${isCompleted ? 'done' : ''}`;
+                // 던전 ID를 클래스로 추가
+                div.className = `task-item bg-${item.id} ${isCompleted ? 'done' : ''}`;
 
                 // 체크박스
                 const checkbox = document.createElement('input');
