@@ -5,31 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>그랜드체이스 숙제표</title>
     <style>
-        /* === 1. 다크/라이트 모드 변수 설정 === */
+        /* === 1. 다크/라이트 모드 변수 설정 (무채색 계열) === */
         :root {
-            /* Light Mode Default */
-            --bg-main: #f4f7f6;
+            /* Light Mode Default (Monochromatic) */
+            --bg-main: #f0f0f0;
             --bg-container: #ffffff;
-            --bg-item: #e8f0f3;
+            --bg-item: #e8e8e8;
             --text-color: #333333;
-            --accent-color: #3f72af;
-            --shadow-color: rgba(0, 0, 0, 0.08);
-            --border-color: #ddd;
-            --shared-tag: #5cb85c;
-            --drag-bg: #c9e0ed;
+            --accent-color: #cc0000; /* Red for important elements */
+            --shadow-color: rgba(0, 0, 0, 0.15);
+            --border-color: #ccc;
+            --shared-tag: #666666; /* Neutral Grey Tag */
+            --drag-bg: #ffcccc;
         }
 
-        /* Dark Mode (Class 적용 시) */
+        /* Dark Mode (Class 적용 시) (Monochromatic) */
         .dark-mode {
-            --bg-main: #1a1a2e;
-            --bg-container: #16213e;
-            --bg-item: #0f3460;
+            --bg-main: #1c1c1c;
+            --bg-container: #252525;
+            --bg-item: #333333;
             --text-color: #f0f0f0;
-            --accent-color: #e94560;
-            --shadow-color: rgba(0, 0, 0, 0.5);
-            --border-color: #0f3460;
-            --shared-tag: #007bff;
-            --drag-bg: #3c1e70;
+            --accent-color: #ff3333; /* Bright Red for important elements */
+            --shadow-color: rgba(255, 255, 255, 0.1);
+            --border-color: #444;
+            --shared-tag: #999999; /* Neutral Grey Tag */
+            --drag-bg: #550000;
         }
 
         /* === 2. 기본 스타일 === */
@@ -54,13 +54,13 @@
         
         /* 제목 및 헤더 */
         h1 { text-align: center; color: var(--accent-color); margin-bottom: 5px; font-size: 2em; }
-        p.sub-title { text-align: center; color: #888; font-size: 0.9em; margin-top: 0; margin-bottom: 25px; }
+        p.sub-title { text-align: center; color: var(--text-color); opacity: 0.7; font-size: 0.9em; margin-top: 0; margin-bottom: 25px; }
         h2 { 
             border-bottom: 2px solid var(--border-color); 
             padding-bottom: 8px; 
             margin-top: 35px; 
             font-size: 1.5em; 
-            color: var(--accent-color); 
+            color: var(--text-color); /* H2는 일반 텍스트 색상 */
             text-align: center;
         }
         h3 { color: var(--text-color); margin-top: 15px; margin-bottom: 10px; font-size: 1.1em; }
@@ -94,10 +94,9 @@
             border: 1px solid var(--border-color); 
             padding: 8px 12px; 
             border-radius: 20px; 
-            cursor: grab; /* 드래그 가능 아이콘 */
+            cursor: grab; 
             font-size: 0.85em; 
             transition: all 0.3s;
-            /* DND 관련 스타일 */
             user-select: none;
         }
         .char-btn:hover { background-color: var(--accent-color); color: white; }
@@ -105,14 +104,12 @@
             background-color: var(--accent-color); 
             color: white; 
             font-weight: bold; 
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 5px var(--shadow-color);
         }
-        /* 드래그 중인 아이템 스타일 */
         .char-btn.dragging {
             opacity: 0.5;
             box-shadow: 0 5px 15px var(--shadow-color);
         }
-        /* 드롭될 위치 표시 */
         .char-btn.drag-over {
             border: 2px dashed var(--accent-color);
             background-color: var(--drag-bg);
@@ -154,11 +151,11 @@
         .count-display {
             font-size: 1em;
             font-weight: bold;
-            color: var(--accent-color);
+            color: var(--text-color); /* 기본 카운트는 일반 텍스트 */
             min-width: 40px;
             text-align: right;
         }
-        .count-display.completed { color: var(--shared-tag); }
+        .count-display.completed { color: var(--accent-color); } /* 완료 시 빨간색 */
 
         .account-shared-tag { 
             font-size: 0.7em; 
@@ -183,21 +180,21 @@
 <body class="dark-mode"> <div class="container">
     <button id="theme-toggle" onclick="toggleTheme()"></button>
     <h1>그랜드체이스 숙제표</h1>
-    <p class="sub-title">일일: 매일 15:00 초기화 | 주간: 수요일 15:00 초기화 (KST)</p>
+    <p class.sub-title>일일: 매일 15:00 초기화 | 주간: 수요일 15:00 초기화 (KST)</p>
 
-    <h2>캐릭터 선택</h2>
+    <h2>캐릭터 선택 (드래그 앤 드롭으로 순서 변경 가능)</h2>
     <div id="character-selector"></div>
     
     <h2 id="current-char-name"></h2>
 
     <div id="task-view-container">
         <div class="task-column">
-            <h3>📅 일일 숙제 (캐릭터별)</h3>
+            <h3>📅 일일 숙제 (캐릭터별 및 계정 공유 일일)</h3>
             <div id="daily-list"></div>
         </div>
 
         <div class="task-column">
-            <h3>⚔️ 주간/계정 공유 숙제</h3>
+            <h3>⚔️ 주간 숙제 (캐릭터별)</h3>
             <div id="weekly-list"></div>
         </div>
     </div>
@@ -221,19 +218,20 @@
     const DUNGEON_DATA = {
         daily: [
             { id: 'berkas', name: '베르카스의 요새', max: 1, shared: false },
-            { id: 'tower', name: '소멸의 탑', max: 3, shared: false }, // 3회 수정
-            { id: 'void', name: '공허', max: 2, type: 'weekly', shared: false }, // 공허 (Weekly, 2회)
+            { id: 'tower', name: '소멸의 탑', max: 3, shared: false },
             { id: 'tero', name: '이세계: 테로카 공성전', max: 1, shared: false },
             { id: 'temple', name: '이세계: 시간의 사원', max: 1, shared: false },
             { id: 'kounat', name: '이세계: 코우나트 대폭발', max: 1, shared: false },
+            { id: 'corridor', name: '무한회랑', max: 3, type: 'daily', shared: true } // 일일/계정 공유로 이동
         ],
         weekly: [
             { id: 'judge', name: '심판의 땅', max: 3, type: 'weekly', shared: false }, // 3회 수정
             { id: 'abyss', name: '심연의 길', max: 1, type: 'weekly', shared: false },
+            // 공허 던전 상세 반영
+            { id: 'void', name: '공허 던전', max: 2, type: 'weekly', shared: false, sub: '(침공:월 / 잠식:수 / 악몽:금 활성화)' }, 
             { id: 'w_furnace', name: '지옥의 용광로', max: 3, type: 'weekly', shared: false },
             { id: 'w_sanctum', name: '파멸의 성소', max: 3, type: 'weekly', shared: false },
-            { id: 'w_laby', name: '환영의 미궁', max: 5, type: 'weekly', shared: false },
-            { id: 'corridor', name: '무한회랑', max: 3, type: 'daily', shared: true } // 일일/계정 공유, 3회 수정
+            { id: 'w_laby', name: '환영의 미궁', max: 5, type: 'weekly', shared: false }
         ]
     };
 
@@ -245,19 +243,20 @@
 
     const generateInitialTasks = (type) => {
         const tasks = {};
-        DUNGEON_DATA[type].forEach(d => {
-            if (d.shared) return; 
+        // 공유 숙제는 캐릭터별로 초기화하지 않음
+        DUNGEON_DATA[type].filter(d => !d.shared).forEach(d => {
             tasks[d.id] = { completed: 0, max: d.max };
         });
         return tasks;
     };
     
     const getTaskMaxCount = (taskId) => {
-        const dailyItem = DUNGEON_DATA.daily.find(d => d.id === taskId);
-        if (dailyItem) return dailyItem.max;
-        const weeklyItem = DUNGEON_DATA.weekly.find(d => d.id === taskId);
-        if (weeklyItem) return weeklyItem.max;
-        return 1;
+        // 일일 목록에서 찾기
+        let item = DUNGEON_DATA.daily.find(d => d.id === taskId);
+        // 없으면 주간 목록에서 찾기
+        if (!item) item = DUNGEON_DATA.weekly.find(d => d.id === taskId);
+        
+        return item ? item.max : 1;
     };
 
     const getAccountSharedTaskStatus = (id) => {
@@ -273,68 +272,63 @@
         // 1. 캐릭터 순서 불러오기
         const savedOrder = localStorage.getItem('characterOrder');
         if (savedOrder) {
-            CHARACTER_NAMES = JSON.parse(savedOrder);
+            // 저장된 순서에 맞춰서 기본 캐릭터 목록을 재배치
+            const savedNames = JSON.parse(savedOrder);
+            // 기본 목록에서 누락된 캐릭터가 있을 경우를 대비하여 현재 순서에 추가
+            const newNames = CHARACTER_NAMES.filter(name => !savedNames.includes(name));
+            CHARACTER_NAMES = [...savedNames, ...newNames];
         }
         
         // 2. 캐릭터 데이터 불러오기/생성
         const savedData = localStorage.getItem('gc_characters');
         const lastReset = localStorage.getItem('lastResetTime');
 
-        // 기존 캐릭터 ID 목록
+        // 기존 캐릭터 ID 목록 생성
         const existingIds = savedData ? JSON.parse(savedData).map(c => c.id) : [];
         let nextId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
+        
+        // 기존 캐릭터 맵 생성 (이름 기준)
+        const charMap = new Map(savedData ? JSON.parse(savedData).map(c => [c.name, c]) : []);
 
-        if (savedData) {
-            characters = JSON.parse(savedData);
+        // 순서 배열(CHARACTER_NAMES)에 맞춰 캐릭터 데이터 정렬/업데이트
+        characters = CHARACTER_NAMES.map(name => {
+            let char = charMap.get(name);
             
-            // 기존 캐릭터 맵 생성 (ID 기준)
-            const charMap = new Map(characters.map(c => [c.name, c]));
-
-            // 순서 배열(CHARACTER_NAMES)에 맞춰 캐릭터 데이터 정렬/업데이트
-            characters = CHARACTER_NAMES.map(name => {
-                let char = charMap.get(name);
-                
-                if (!char) {
-                    // 순서에 새로운 캐릭터가 추가되었을 경우 (업데이트 대비)
-                    char = {
-                        id: nextId++,
-                        name: name,
-                        dailyTasks: generateInitialTasks('daily'),
-                        weeklyTasks: generateInitialTasks('weekly')
-                    };
-                }
-                
-                // 데이터 구조 갱신 (max count 반영 등)
-                const updatedChar = { ...char };
-                
-                DUNGEON_DATA.daily.forEach(d => {
-                    const savedTask = char.dailyTasks ? char.dailyTasks[d.id] : null;
-                    updatedChar.dailyTasks[d.id] = {
-                        completed: savedTask ? (savedTask.completed || 0) : 0,
-                        max: d.max
-                    };
-                });
-                
-                DUNGEON_DATA.weekly.filter(d => !d.shared).forEach(d => {
-                    const savedTask = char.weeklyTasks ? char.weeklyTasks[d.id] : null;
-                    updatedChar.weeklyTasks[d.id] = {
-                        completed: savedTask ? (savedTask.completed || 0) : 0,
-                        max: d.max
-                    };
-                });
-                
-                return updatedChar;
+            if (!char) {
+                // 새로운 캐릭터 생성 (이름은 있지만 데이터는 없는 경우)
+                char = {
+                    id: nextId++,
+                    name: name,
+                    dailyTasks: generateInitialTasks('daily'),
+                    weeklyTasks: generateInitialTasks('weekly')
+                };
+            }
+            
+            // 데이터 구조 갱신 (max count 반영 및 새 던전/구조 추가)
+            const updatedChar = { ...char };
+            
+            // 일일 숙제 갱신/초기화 (공유 숙제 제외)
+            updatedChar.dailyTasks = updatedChar.dailyTasks || {};
+            DUNGEON_DATA.daily.filter(d => !d.shared).forEach(d => {
+                const savedTask = updatedChar.dailyTasks[d.id];
+                updatedChar.dailyTasks[d.id] = {
+                    completed: savedTask ? (savedTask.completed || 0) : 0,
+                    max: d.max
+                };
             });
             
-        } else {
-            // 로컬에 데이터가 없으면 초기 24개 캐릭터 생성
-            characters = CHARACTER_NAMES.map((name, index) => ({
-                id: index + 1,
-                name: name,
-                dailyTasks: generateInitialTasks('daily'),
-                weeklyTasks: generateInitialTasks('weekly')
-            }));
-        }
+            // 주간 숙제 갱신/초기화 (공유 숙제 제외)
+            updatedChar.weeklyTasks = updatedChar.weeklyTasks || {};
+            DUNGEON_DATA.weekly.filter(d => !d.shared).forEach(d => {
+                const savedTask = updatedChar.weeklyTasks[d.id];
+                updatedChar.weeklyTasks[d.id] = {
+                    completed: savedTask ? (savedTask.completed || 0) : 0,
+                    max: d.max
+                };
+            });
+            
+            return updatedChar;
+        });
         
         localStorage.setItem('gc_characters', JSON.stringify(characters));
         currentChrId = localStorage.getItem('currentChrId') || (characters.length > 0 ? characters[0].id : null);
@@ -342,7 +336,7 @@
         checkAndApplyReset(characters, lastReset);
     }
 
-    // === 3. 초기화 로직 (이전과 동일) ===
+    // === 3. 초기화 로직 ===
     function checkAndApplyReset(currentChars, lastResetTime) {
         const now = new Date();
         const kstNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
@@ -355,7 +349,8 @@
 
         let weeklyResetPoint = new Date(kstNow);
         const day = weeklyResetPoint.getDay(); 
-        const diff = (day + 7 - 3) % 7; 
+        const WEDNESDAY = 3; 
+        const diff = (day + 7 - WEDNESDAY) % 7; 
         weeklyResetPoint.setDate(weeklyResetPoint.getDate() - diff);
         weeklyResetPoint.setHours(15, 0, 0, 0);
         if (weeklyResetPoint > kstNow) weeklyResetPoint.setDate(weeklyResetPoint.getDate() - 7);
@@ -370,8 +365,9 @@
             characters = currentChars.map(char => {
                 let newChar = {...char};
                 
+                // 1. 캐릭터별 숙제 초기화
                 if (isDailyReset) {
-                    DUNGEON_DATA.daily.forEach(d => {
+                    DUNGEON_DATA.daily.filter(d => !d.shared).forEach(d => {
                         newChar.dailyTasks[d.id].completed = 0;
                     });
                 }
@@ -384,8 +380,9 @@
                 return newChar;
             });
             
+            // 2. 계정 공유 숙제 초기화 (무한회랑)
             if (isDailyReset) {
-                const infiniteCorridor = DUNGEON_DATA.weekly.find(d => d.id === 'corridor');
+                const infiniteCorridor = DUNGEON_DATA.daily.find(d => d.id === 'corridor');
                 if (infiniteCorridor && infiniteCorridor.shared) {
                     setAccountSharedTaskStatus('corridor', { completed: 0, max: infiniteCorridor.max });
                 }
@@ -414,15 +411,7 @@
             const children = Array.from(selector.children);
             children.forEach(child => child.classList.remove('drag-over'));
             
-            // 드래그된 요소가 타겟 요소 앞에 위치할지 뒤에 위치할지 결정
-            const rect = target.getBoundingClientRect();
-            const isBefore = e.clientX < rect.left + rect.width / 2;
-            
-            if (isBefore) {
-                target.classList.add('drag-over');
-            } else {
-                target.classList.add('drag-over');
-            }
+            target.classList.add('drag-over');
         }
     }
 
@@ -443,7 +432,7 @@
 
             // 배열에서 순서 변경
             const [removed] = CHARACTER_NAMES.splice(sourceIndex, 1);
-            CHARACTER_NAMES.splice(targetIndex, 0, removed);
+            CHARACTER_NAMES.splice(targetIndex > sourceIndex ? targetIndex : targetIndex, 0, removed);
             
             // 로컬 스토리지에 저장
             localStorage.setItem('characterOrder', JSON.stringify(CHARACTER_NAMES));
@@ -451,7 +440,7 @@
             // UI 업데이트 및 데이터 재초기화 (순서 적용)
             render();
         }
-        children.forEach(child => child.classList.remove('drag-over'));
+        document.getElementById('character-selector').querySelectorAll('.char-btn').forEach(btn => btn.classList.remove('drag-over'));
     }
 
     function handleDragEnd(e) {
@@ -460,7 +449,7 @@
         document.getElementById('character-selector').querySelectorAll('.char-btn').forEach(btn => btn.classList.remove('drag-over'));
     }
 
-    // === 5. 액션 핸들러 및 UI/UX 테마 로직 (이전과 동일) ===
+    // === 5. 액션 핸들러 (단일 클릭 완료 로직 적용) ===
 
     function selectCharacter(id) {
         currentChrId = id;
@@ -472,17 +461,19 @@
         const item = DUNGEON_DATA[type].find(d => d.id === taskId);
         
         if (shared) {
+            // 계정 공유 숙제 처리 (0 <-> max)
             const status = getAccountSharedTaskStatus(taskId);
-            const newCount = (status.completed + 1) % (item.max + 1); 
+            const newCount = status.completed === 0 ? item.max : 0; 
             setAccountSharedTaskStatus(taskId, { completed: newCount, max: item.max });
         } else {
+            // 캐릭터별 숙제 처리 (0 <-> max)
             const charIndex = characters.findIndex(c => c.id === chrId);
             if (charIndex === -1) return;
     
             const char = characters[charIndex];
             const currentCount = char[`${type}Tasks`][taskId].completed;
             
-            const newCount = (currentCount + 1) % (item.max + 1);
+            const newCount = currentCount === 0 ? item.max : 0;
             
             char[`${type}Tasks`][taskId].completed = newCount;
             localStorage.setItem('gc_characters', JSON.stringify(characters));
@@ -490,6 +481,8 @@
 
         render();
     }
+    
+    // === 6. UI/UX 테마 로직 ===
     
     const getTheme = () => localStorage.getItem('theme') || 'dark';
 
@@ -509,7 +502,7 @@
         button.innerText = theme === 'dark' ? '☀️ 낮 모드' : '🌙 밤 모드';
     }
 
-    // === 6. 화면 렌더링 ===
+    // === 7. 화면 렌더링 ===
 
     function renderCharacterSelector() {
         const selector = document.getElementById('character-selector');
@@ -554,7 +547,8 @@
             listToRender.forEach(item => {
                 const isShared = item.shared || false;
                 let taskStatus;
-
+                
+                // 공유 숙제는 캐릭터 ID 대신 'shared' 상태 사용
                 if (isShared) {
                     taskStatus = getAccountSharedTaskStatus(item.id);
                 } else {
@@ -581,10 +575,20 @@
                 const label = document.createElement('span');
                 label.className = 'task-label';
                 label.innerText = item.name;
-                
                 labelGroup.appendChild(label);
+                
+                if (item.sub) { // 공허 던전 서브 라벨
+                    const subLabel = document.createElement('span');
+                    subLabel.style.fontSize = '0.8em';
+                    subLabel.style.marginLeft = '10px';
+                    subLabel.style.opacity = '0.8';
+                    subLabel.style.fontWeight = 'normal';
+                    subLabel.style.color = 'var(--text-color)';
+                    subLabel.innerText = item.sub;
+                    labelGroup.appendChild(subLabel);
+                }
 
-                if (isShared) {
+                if (isShared) { // 계정 공유 태그
                     const tag = document.createElement('span');
                     tag.className = 'account-shared-tag';
                     tag.innerText = item.type === 'daily' ? '계정 공유 (일일)' : '계정 공유 (주간)';
@@ -619,11 +623,12 @@
         renderTaskList();
     }
 
-    // === 7. 시작 및 주기적 체크 ===
+    // === 8. 시작 및 주기적 체크 ===
     
     setTheme(getTheme()); 
     render();
     
+    // 1분마다 초기화 시간이 지났는지 체크
     setInterval(render, 60000); 
 
 </script>
