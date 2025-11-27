@@ -139,13 +139,21 @@
         #favorite-list { display: flex; flex-direction: column; gap: 10px; min-height: 100px; }
         .favorite-list-placeholder { color: var(--text-color); opacity: 0.5; font-style: italic; font-size: 0.9em; text-align: center; padding: 10px; }
         
-        /* 일일/주간 숙제 컨테이너 */
+        /* 일일/주간 숙제 컨테이너 (사이드바 옆의 나머지 공간) */
         #task-view-container { 
             flex: 1; 
-            display: flex; 
+            display: flex; /* 내부의 일일/주간 컬럼을 나란히 배치 */
             gap: 30px; 
         }
-        .task-column { flex: 1; background-color: var(--bg-main); padding: 20px; border-radius: 10px; box-shadow: inset 0 0 10px var(--shadow-color); }
+        
+        /* 일일/주간 숙제 컬럼 Wrapper */
+        .task-column-wrapper { 
+            flex: 1; 
+            background-color: var(--bg-main); 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: inset 0 0 10px var(--shadow-color); 
+        }
 
         /* === 6. 캐릭터 버튼 공통 스타일 === */
         .char-btn { 
@@ -158,7 +166,7 @@
             font-size: 0.85em; 
             transition: all 0.2s ease-in-out; 
             user-select: none;
-            position: relative; /* 프로그레스 바를 위한 설정 */
+            position: relative; 
         }
         .char-btn.dragging { opacity: 0.5; box-shadow: 0 5px 15px var(--shadow-color); }
         .char-btn.drag-over { border: 2px dashed var(--accent-color); background-color: var(--drag-bg); }
@@ -181,13 +189,38 @@
         /* === 7. 숙제 아이템 및 통계 영역 === */
         .task-item { display: flex; align-items: center; background-color: var(--bg-item); margin-bottom: 10px; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 1em; justify-content: flex-start; }
         .task-item.done { opacity: 0.6; }
-        .task-label-group { display: flex; align-items: center; margin-left: 10px; }
         
-        /* 캐릭터별 완료율 표시 영역 */
-        #char-stats-display {
-            padding: 15px 0;
+        /* 레이블 그룹 */
+        .task-label-group { 
+            display: flex; 
+            align-items: center; 
+            margin-left: 10px; 
+            flex-wrap: wrap; 
+        }
+        
+        /* 스티커 스타일 */
+        .task-tag {
+            font-size: 0.7em;
+            font-weight: bold;
+            color: white;
+            background-color: var(--shared-tag); 
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+        
+        /* 요일 스티커 전용 색상 */
+        .task-tag.day {
+            background-color: #9c27b0; 
+        }
+
+        /* 캐릭터별 완료율 표시 영역 (새로운 위치에 맞게 스타일 조정) */
+        #daily-stats-display, #weekly-stats-display {
+            padding: 10px 0;
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 15px;
+            margin-top: -10px; /* 제목과의 간격 조정 */
         }
         .stat-item {
             display: flex;
@@ -262,15 +295,13 @@
 
         <div id="task-view-container">
             
-            <div id="char-stats-display"></div>
-            
-            <div class="task-column">
-                <h3>📅 일일 숙제 (캐릭터별 및 계정 공유 일일)</h3>
+            <div class="task-column-wrapper">
+                <h3>📅 일일 숙제</h3> <div id="daily-stats-display"></div> 
                 <div id="daily-list"></div>
             </div>
 
-            <div class="task-column">
-                <h3>⚔️ 주간 숙제 (캐릭터별)</h3>
+            <div class="task-column-wrapper">
+                <h3>⚔️ 주간 숙제</h3> <div id="weekly-stats-display"></div>
                 <div id="weekly-list"></div>
             </div>
         </div>
@@ -312,9 +343,9 @@
         weekly: [
             { id: 'judge', name: '심판의 땅', max: 3, shared: false },
             { id: 'abyss', name: '심연의 길', max: 1, shared: false },
-            { id: 'void_mon', name: '공허 침공', max: 1, shared: false, sub: '(월)' }, 
-            { id: 'void_wed', name: '공허 잠식', max: 1, shared: false, sub: '(수)' }, 
-            { id: 'void_fri', name: '공허 악몽', max: 1, shared: false, sub: '(금)' }, 
+            { id: 'void_mon', name: '공허 침공', max: 1, shared: false, sub: '월' }, 
+            { id: 'void_wed', name: '공허 잠식', max: 1, shared: false, sub: '수' }, 
+            { id: 'void_fri', name: '공허 악몽', max: 1, shared: false, sub: '금' }, 
             { id: 'w_furnace', name: '지옥의 용광로', max: 3, shared: false },
             { id: 'w_sanctum', name: '파멸의 성소', max: 3, shared: false },
             { id: 'w_laby', name: '환영의 미궁', max: 5, shared: false }
@@ -438,7 +469,81 @@
         // 렌더링 함수 호출은 render() 내에서 통합 관리
     }
     
-    function checkAndApplyReset(currentChars, lastResetTime) { /* 이전과 동일 */ }
+    function checkAndApplyReset(currentChars, lastResetTime) { 
+        // 기존과 동일한 초기화 로직
+        const now = new Date();
+        const dailyResetHour = 15;
+        const weeklyResetDay = 3; // 수요일 (0:일요일, 1:월요일, ..., 3:수요일)
+
+        const kstNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+        
+        let shouldResetDaily = false;
+        let shouldResetWeekly = false;
+
+        if (lastResetTime) {
+            const lastReset = new Date(lastResetTime);
+            const lastResetKST = new Date(lastReset.toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+
+            // 일일 초기화 확인
+            let nextDailyReset = new Date(lastResetKST);
+            nextDailyReset.setHours(dailyResetHour, 0, 0, 0);
+
+            if (kstNow.getTime() >= nextDailyReset.getTime()) {
+                // 오늘 초기화 시간을 넘겼다면
+                if (kstNow.getDate() > nextDailyReset.getDate() || kstNow.getMonth() > nextDailyReset.getMonth() || kstNow.getFullYear() > nextDailyReset.getFullYear()) {
+                    shouldResetDaily = true;
+                } else if (kstNow.getHours() >= dailyResetHour && lastResetKST.getHours() < dailyResetHour) {
+                    // 같은 날이라도 리셋 시간을 통과했다면
+                    shouldResetDaily = true;
+                }
+            }
+
+            // 주간 초기화 확인
+            let checkTime = new Date(lastResetKST);
+            let nextCheckReset = new Date(lastResetKST);
+            
+            while(checkTime.getTime() < kstNow.getTime()) {
+                // 다음 수요일 15시를 찾음
+                nextCheckReset.setDate(nextCheckReset.getDate() + (weeklyResetDay - nextCheckReset.getDay() + 7) % 7);
+                nextCheckReset.setHours(dailyResetHour, 0, 0, 0);
+
+                // 현재 checkTime과 kstNow 사이에 리셋 시간이 있다면
+                if(nextCheckReset.getTime() > checkTime.getTime() && nextCheckReset.getTime() <= kstNow.getTime()) {
+                    shouldResetWeekly = true;
+                    // 다음 리셋 주기를 위해 checkTime을 1초 후로 이동
+                    checkTime = new Date(nextCheckReset.getTime() + 1000); 
+                } else {
+                    break;
+                }
+            }
+
+
+        } else {
+            // 첫 로드 시 현재 시간 기준으로 리셋 여부 결정 (대부분 리셋 필요)
+            shouldResetDaily = true;
+            shouldResetWeekly = true;
+        }
+
+
+        if (shouldResetDaily) {
+            currentChars.forEach(char => {
+                char.dailyTasks = generateInitialTasks('daily');
+            });
+            // 계정 공유 일일 숙제 초기화
+            setAccountSharedTaskStatus('corridor', { completed: 0, max: getTaskMaxCount('corridor') });
+        }
+
+        if (shouldResetWeekly) {
+            currentChars.forEach(char => {
+                char.weeklyTasks = generateInitialTasks('weekly');
+            });
+        }
+        
+        if (shouldResetDaily || shouldResetWeekly) {
+            localStorage.setItem('lastResetTime', kstNow.toISOString());
+            // console.log('데이터가 초기화되었습니다. Daily:', shouldResetDaily, 'Weekly:', shouldResetWeekly);
+        }
+    }
 
     // === 4. 통계 및 필터 로직 ===
 
@@ -645,6 +750,16 @@
             char[`${type}Tasks`][taskId].completed = newCount;
             localStorage.setItem('gc_characters', JSON.stringify(characters));
         }
+        
+        // 통계 갱신 및 렌더링을 위해 render() 호출
+        const char = characters.find(c => c.id === chrId);
+        if (char) {
+            char.dailyStats = calculateCharStats(char, 'daily');
+            char.weeklyStats = calculateCharStats(char, 'weekly');
+            char.hasIncompleteDaily = char.dailyStats.totalCount > char.dailyStats.completedCount;
+            char.hasIncompleteWeekly = char.weeklyStats.totalCount > char.weeklyStats.completedCount;
+        }
+
 
         render();
     }
@@ -697,7 +812,10 @@
         const charColor = CHAR_COLORS[char.name] || '#808080'; 
         const charTextColor = getTextColor(charColor);
         // 통계 데이터가 char 객체에 이미 계산되어 있다고 가정
-        const overallPercent = char.dailyStats.percentage * 0.5 + char.weeklyStats.percentage * 0.5; 
+        // NaN 방지 처리
+        const dailyPer = char.dailyStats.percentage || 0;
+        const weeklyPer = char.weeklyStats.percentage || 0;
+        const overallPercent = dailyPer * 0.5 + weeklyPer * 0.5; 
 
         const button = document.createElement('button');
         button.className = `char-btn ${char.id == currentChrId ? 'active' : ''}`;
@@ -788,33 +906,38 @@
 
     function renderTaskList() {
         const currentCharacter = characters.find(c => c.id == currentChrId);
-        const statsDisplay = document.getElementById('char-stats-display');
-        statsDisplay.innerHTML = '';
         
         // 숙제 목록이 보이지 않는 문제의 핵심 수정: 
-        // currentChrId가 null일 경우 task-view-container를 숨김
         if (!currentCharacter) {
             document.getElementById('current-char-name').innerText = '캐릭터를 선택해주세요.';
             document.getElementById('task-view-container').style.display = 'none';
+            document.getElementById('daily-stats-display').innerHTML = ''; // 안전하게 초기화
+            document.getElementById('weekly-stats-display').innerHTML = ''; // 안전하게 초기화
             return;
         }
         
         document.getElementById('task-view-container').style.display = 'flex';
         document.getElementById('current-char-name').innerText = `현재 선택 캐릭터: [${currentCharacter.name}]`;
         
-        // 캐릭터별 통계 표시
-        statsDisplay.innerHTML = `
+        // === 캐릭터별 통계 분리 표시 ===
+        
+        const dailyStatsHtml = `
             <div class="stat-item">
                 <span>일일 완료율: <b>${currentCharacter.dailyStats.completedCount}/${currentCharacter.dailyStats.totalCount} (${currentCharacter.dailyStats.percentage}%)</b></span>
                 <div class="stat-bar-container"><div class="stat-bar" style="width: ${currentCharacter.dailyStats.percentage}%;"></div></div>
             </div>
+        `;
+        const weeklyStatsHtml = `
             <div class="stat-item">
                 <span>주간 완료율: <b>${currentCharacter.weeklyStats.completedCount}/${currentCharacter.weeklyStats.totalCount} (${currentCharacter.weeklyStats.percentage}%)</b></span>
                 <div class="stat-bar-container"><div class="stat-bar" style="width: ${currentCharacter.weeklyStats.percentage}%;"></div></div>
             </div>
         `;
+        
+        document.getElementById('daily-stats-display').innerHTML = dailyStatsHtml;
+        document.getElementById('weekly-stats-display').innerHTML = weeklyStatsHtml;
 
-
+        // === 숙제 리스트 렌더링 ===
         const renderList = (type, listId) => {
             const container = document.getElementById(listId);
             container.innerHTML = '';
@@ -855,20 +978,22 @@
                 label.innerText = item.name;
                 labelGroup.appendChild(label);
                 
-                if (item.sub) { 
-                    const subLabel = document.createElement('span');
-                    subLabel.className = 'sub-info';
-                    subLabel.innerText = item.sub;
-                    labelGroup.appendChild(subLabel);
-                }
-
+                // 계정 공유 스티커 추가
                 if (isShared) { 
                     const tag = document.createElement('span');
-                    tag.className = 'account-shared-tag';
-                    tag.innerText = item.type === 'daily' ? '계정 공유 (일일)' : '계정 공유 (주간)';
+                    tag.className = 'task-tag shared'; 
+                    tag.innerText = '계정 공유';
                     labelGroup.appendChild(tag);
                 }
                 
+                // 요일 스티커 추가 (주간 숙제에만 적용)
+                if (type === 'weekly' && item.sub) {
+                    const tag = document.createElement('span');
+                    tag.className = 'task-tag day'; 
+                    tag.innerText = item.sub; 
+                    labelGroup.appendChild(tag);
+                }
+
                 div.appendChild(checkbox);
                 div.appendChild(labelGroup);
 
