@@ -143,19 +143,18 @@
 
     // 던전 목록 (ID, 이름, 그리고 계정 공유 여부)
     const DUNGEON_DATA = {
+        // 현상수배 (wanted) 제거
         daily: [
             { id: 'berkas', name: '베르카스의 요새', shared: false },
             { id: 'tower', name: '소멸의 탑', shared: false },
             { id: 'void', name: '공허', shared: false },
-            { id: 'wanted', name: '현상수배 (GP/큐브)', shared: false },
             { id: 'tero', name: '이세계: 테로카 공성전', shared: false },
             { id: 'temple', name: '이세계: 시간의 사원', shared: false },
             { id: 'kounat', name: '이세계: 코우나트 대폭발', shared: false },
-            // 계정 공유 일일 숙제 (무한회랑)는 별도로 관리 (Weekly list로 이동)
         ],
         weekly: [
-            { id: 'judge', name: '심판의 땅', type: 'weekly', shared: false }, // 주간으로 이동
-            { id: 'abyss', name: '심연의 길', type: 'weekly', shared: false }, // 주간으로 이동
+            { id: 'judge', name: '심판의 땅', type: 'weekly', shared: false },
+            { id: 'abyss', name: '심연의 길', type: 'weekly', shared: false },
             { id: 'w_furnace', name: '지옥의 용광로', type: 'weekly', shared: false },
             { id: 'w_sanctum', name: '파멸의 성소', type: 'weekly', shared: false },
             { id: 'w_laby', name: '환영의 미궁', type: 'weekly', shared: false },
@@ -193,6 +192,31 @@
 
         if (savedData) {
             characters = JSON.parse(savedData);
+            // 새로운 던전 목록과 기존 목록을 비교하여 데이터 구조를 갱신합니다.
+            const allDailyIds = DUNGEON_DATA.daily.map(d => d.id);
+            const allWeeklyIds = DUNGEON_DATA.weekly.map(d => d.id);
+
+            characters = characters.map(char => {
+                let updatedDaily = {};
+                let updatedWeekly = {};
+                
+                // Daily Tasks 갱신
+                allDailyIds.forEach(id => {
+                    updatedDaily[id] = char.dailyTasks ? (char.dailyTasks[id] || false) : false;
+                });
+                
+                // Weekly Tasks 갱신 (무한회랑은 공유 숙제로 따로 관리되므로 제외)
+                allWeeklyIds.filter(id => id !== 'corridor').forEach(id => {
+                    updatedWeekly[id] = char.weeklyTasks ? (char.weeklyTasks[id] || false) : false;
+                });
+
+                return {
+                    ...char,
+                    dailyTasks: updatedDaily,
+                    weeklyTasks: updatedWeekly
+                };
+            });
+
         } else {
             // 로컬에 데이터가 없으면 24개 캐릭터 생성
             characters = CHARACTER_NAMES.map((name, index) => ({
@@ -201,9 +225,9 @@
                 dailyTasks: generateInitialTasks('daily'),
                 weeklyTasks: generateInitialTasks('weekly')
             }));
-            localStorage.setItem('gc_characters', JSON.stringify(characters));
         }
         
+        localStorage.setItem('gc_characters', JSON.stringify(characters));
         currentChrId = localStorage.getItem('currentChrId') || characters[0].id;
         
         checkAndApplyReset(characters, lastReset);
@@ -240,6 +264,7 @@
                 
                 // 1. 캐릭터별 숙제 초기화
                 if (isDailyReset) newChar.dailyTasks = generateInitialTasks('daily');
+                // 주간 초기화 시 주간 숙제만 초기화
                 if (isWeeklyReset) newChar.weeklyTasks = generateInitialTasks('weekly');
                 return newChar;
             });
@@ -267,10 +292,9 @@
 
     function toggleTask(chrId, type, taskId, shared) {
         if (shared) {
-            // 계정 공유 숙제 처리: 로컬 스토리지의 공유 상태를 변경
+            // 계정 공유 숙제 처리
             const newStatus = !getAccountSharedTaskStatus(taskId);
             setAccountSharedTaskStatus(taskId, newStatus);
-            // 모든 캐릭터에 이 변경 사항은 동일하게 적용됨 (별도 캐릭터 데이터 업데이트 불필요)
         } else {
             // 캐릭터별 숙제 처리
             const charIndex = characters.findIndex(c => c.id === chrId);
