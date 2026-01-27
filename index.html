@@ -34,11 +34,9 @@
 
         .char-btn { width: 100%; border-radius: 18px; background-color: var(--bg-item); border: 2px solid transparent; padding: 12px 0; cursor: pointer; transition: 0.25s; display: flex; flex-direction: column; align-items: center; }
         .char-btn.active { border-color: var(--char-color, var(--accent-color)); background-color: var(--bg-container); transform: translateY(-5px); box-shadow: 0 8px 15px var(--shadow-color); }
-        
-        /* 즐겨찾기 시 노란색 대신 고유 색상 테두리 적용 */
         .char-btn.is-fav { border: 2.5px solid var(--char-color, #ffd43b); }
 
-        .multi-gauge { width: 80%; margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+        .multi-gauge { width: 80%; margin-top: 8px; display: flex; flex-direction: column; gap: 3px; pointer-events: none; }
         .gauge-layer { height: 5px; background: var(--progress-bar-bg); border-radius: 10px; overflow: hidden; display: flex; }
         .void-cell { flex: 1; height: 100%; opacity: 0.15; }
         .void-cell.done-1 { opacity: 1; background: var(--void-1); }
@@ -55,37 +53,24 @@
         .column { flex: 1; background: var(--bg-item); padding: 20px; border-radius: 25px; min-height: 480px; }
         .column h3 { margin-top: 0; text-align: center; margin-bottom: 20px; }
         
-        .task-item { 
-            display: flex; align-items: center; padding: 15px; background: var(--bg-container); margin-bottom: 12px; 
-            border-radius: 20px; cursor: pointer; position: relative; transition: 0.2s; 
-            justify-content: space-between;
-        }
+        .task-item { display: flex; align-items: center; padding: 15px; background: var(--bg-container); margin-bottom: 12px; border-radius: 20px; cursor: pointer; position: relative; transition: 0.2s; justify-content: space-between; }
         .task-item.done { opacity: 0.45; }
         .task-content { display: flex; align-items: center; gap: 12px; }
-
         .all-check-wrapper { display: flex; flex-direction: column; align-items: center; margin-left: auto; z-index: 10; cursor: pointer; }
         .badge { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; color: #fff; font-size: 11px; align-items: center; justify-content: center; font-weight: bold; border: none; pointer-events: none; }
 
         .calendar-section { width: 100%; display: flex; gap: 20px; margin-top: 20px; box-sizing: border-box; align-items: stretch; }
         .weekly-report { width: 180px; background: var(--bg-item); padding: 20px; border-radius: 25px; display: flex; flex-direction: column; }
         .calendar-main { flex: 1; background: var(--bg-item); padding: 20px; border-radius: 25px; display: flex; flex-direction: column; }
-        
         .day-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; font-size: 0.8em; font-weight: bold; margin-bottom: 15px; opacity: 0.7; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; flex: 1; }
-
-        .fill-cell { 
-            position: relative; background: var(--progress-bar-bg); border-radius: 12px; overflow: hidden; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.03);
-            min-height: 85px; 
-        }
+        .fill-cell { position: relative; background: var(--progress-bar-bg); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.03); min-height: 85px; }
         .fill-bar { position: absolute; bottom: 0; left: 0; width: 100%; transition: height 0.5s ease; z-index: 1; }
         .fill-text { position: relative; z-index: 2; font-weight: bold; font-size: 0.85em; }
         .fill-label { position: relative; z-index: 2; font-size: 0.7em; opacity: 0.8; }
-
         .top-btn { border: none; padding: 8px 15px; border-radius: 50px; cursor: pointer; font-family: inherit; font-weight: bold; background: var(--bg-item); color: var(--text-color); transition: 0.2s; }
         .top-btn:hover { filter: brightness(0.9); }
         .top-btn.active-filter { background: var(--accent-color); color: white; }
-
         .footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 0.9em; }
         .credit { color: #00bfff; font-weight: bold; } 
     </style>
@@ -97,16 +82,12 @@
         <button id="filter-btn" class="top-btn" onclick="toggleFilter()">🔍 숙제 남은 캐릭터만 보기</button>
         <button id="theme-btn" class="top-btn" onclick="toggleTheme()">테마 변경</button>
     </div>
-
     <h1 style="text-align: center;">그랜드체이스 스케쥴러</h1>
-    
     <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 0.9em; opacity: 0.8;">
-        <div>초기화 : 일일 15:00 | 주간: 수요일 15:00 (KST)</div>
+        <div>일일 15:00 | 주간: 수요일 15:00 초기화 (KST)</div>
         <div id="current-time-display"></div>
     </div>
-
     <div id="character-selector" ondragover="allowDrop(event)" ondragleave="dragLeave(this)" ondrop="dropToUnfav(event)"></div>
-
     <div class="main-layout">
         <div id="favorite-sidebar" ondragover="allowDrop(event)" ondragleave="dragLeave(this)" ondrop="dropToFavorite(event)">
             <h3 style="text-align: center; margin-top: 0;">⭐ 즐겨찾기</h3>
@@ -117,7 +98,6 @@
             <div class="column"><h3>⚔️ 주간 숙제</h3><div id="weekly-list"></div></div>
         </div>
     </div>
-
     <div class="calendar-section">
         <div class="weekly-report">
             <h4 style="margin:0 0 15px 0; text-align:center;">📊 주간 달성률</h4>
@@ -130,7 +110,6 @@
             <div id="calendar-grid" class="calendar-grid"></div>
         </div>
     </div>
-
     <div class="footer">
         <div>• 즐겨찾기 된 캐릭터만 달력 통계에 반영됩니다.<br>• Alt + 클릭: 즐겨찾기 추가/해제</div>
         <div class="credit">Made by 깡</div>
@@ -139,18 +118,15 @@
 
 <script>
     const CHAR_COLORS = {
-        '엘리시스': '#e03131', '리르': '#66a80f', '아르메': '#9c36b5', 
-        '라스': '#339af0', '라이언': '#2f9e44', '로난': '#1971c2', '에이미': '#f06595', '진': '#f08c00',
-        '지크하트': '#495057', '마리': '#339af0', '디오': '#5f3dc4', '제로': '#0ca678', 
-        '레이': '#e599f7', '루퍼스': '#c92a2a', '린': '#1864ab', '아신': '#1098ad', 
-        '라임': '#94d82d', '에델': '#4dabf7', '베이가스': '#7048e8', '데카네': '#4b0082', 
-        '아이': '#74c0fc', '칼리아': '#ff6b6b', '우노': '#087f5b', '이리스': '#d3f9d8'
+        '엘리시스': '#e03131', '리르': '#66a80f', '아르메': '#9c36b5', '라스': '#339af0', '라이언': '#2f9e44', '로난': '#1971c2', '에이미': '#f06595', '진': '#f08c00',
+        '지크하트': '#495057', '마리': '#339af0', '디오': '#5f3dc4', '제로': '#0ca678', '레이': '#e599f7', '루퍼스': '#c92a2a', '린': '#1864ab', '아신': '#1098ad', 
+        '라임': '#94d82d', '에델': '#4dabf7', '베이가스': '#7048e8', '데카네': '#4b0082', '아이': '#74c0fc', '칼리아': '#ff6b6b', '우노': '#087f5b', '이리스': '#d3f9d8'
     };
 
     const CHARS = Object.keys(CHAR_COLORS);
     const DATA = {
         void: [{id:'v1', name:'공허 침공', day:'월'}, {id:'v2', name:'공허 잠식', day:'수'}, {id:'v3', name:'공허 악몽', day:'금'}],
-        daily: [{id:'d1', name:'베르카스의 요새'}, {id:'d2', name:'소멸의 탑'}, {id:'d3', name:'테로카 공성전'}, {id:'d4', name:'시간의 사원'}, {id:'d5', name:'코우나트 대폭발'}, {id:'d6', name:'무한회랑', shared:true, day:'공'}],
+        daily: [{id:'d1', name:'베르카스의 요새'}, {id:'d2', name:'소멸의 탑'}, {id:'d3', name:'테로카 공성전'}, {id:'d4', name:'시간의 사원'}, {id:'d5', name:'코우나트 대폭발'}, {id:'d6', name:'무한회랑', shared:true, day:'계정'}],
         weekly: [{id:'w2', name:'심연의 길'}, {id:'w5', name:'환영의 미궁'}, {id:'w4', name:'파멸의 성소'}, {id:'w3', name:'지옥의 용광로'}, {id:'w1', name:'심판의 땅'}]
     };
 
@@ -160,7 +136,7 @@
     let filterUnfinished = false;
 
     function init() {
-        const saved = localStorage.getItem('gcc_v26_data');
+        const saved = localStorage.getItem('gcc_v27_data');
         if (saved) charList = JSON.parse(saved);
         else charList = CHARS.map((name, i) => ({ id: i + 1, name, daily: {}, weekly: {}, void: {}, fav: false }));
         render();
@@ -189,33 +165,43 @@
                 else { currentId = char.id; render(); } 
             };
             btn.ondragstart = () => { draggedCharId = char.id; };
+            // 캐릭터끼리 드롭하여 순서 바꾸기
+            btn.ondragover = (e) => e.preventDefault();
+            btn.ondrop = (e) => { e.stopPropagation(); moveCharacter(draggedCharId, char.id); };
+            
             selector.appendChild(btn);
 
             if (char.fav) {
                 const fBtn = btn.cloneNode(true);
                 fBtn.onclick = btn.onclick;
                 fBtn.ondragstart = btn.ondragstart;
+                fBtn.ondragover = btn.ondragover;
+                fBtn.ondrop = btn.ondrop;
                 favList.appendChild(fBtn);
             }
         });
 
-        const activeChar = charList.find(c => c.id === currentId);
         document.querySelectorAll('.char-btn').forEach(b => { 
             const bid = parseInt(b.dataset.id);
             const targetChar = charList.find(c => c.id === bid);
-            b.style.setProperty('--char-color', CHAR_COLORS[targetChar.name]); // 모든 버튼에 고유색 변수 할당
-            
-            if(bid === currentId) {
-                b.classList.add('active');
-            } else {
-                b.classList.remove('active');
-            }
+            b.style.setProperty('--char-color', CHAR_COLORS[targetChar.name]);
+            if(bid === currentId) b.classList.add('active');
+            else b.classList.remove('active');
         });
         
         renderTasks();
         saveHistory();
         renderStats();
-        localStorage.setItem('gcc_v26_data', JSON.stringify(charList));
+        localStorage.setItem('gcc_v27_data', JSON.stringify(charList));
+    }
+
+    function moveCharacter(fromId, toId) {
+        if (fromId === toId) return;
+        const fromIndex = charList.findIndex(c => c.id === fromId);
+        const toIndex = charList.findIndex(c => c.id === toId);
+        const [movedChar] = charList.splice(fromIndex, 1);
+        charList.splice(toIndex, 0, movedChar);
+        render();
     }
 
     function createCharBtn(char) {
@@ -224,16 +210,11 @@
         btn.dataset.id = char.id; btn.draggable = true;
         const dDone = DATA.daily.filter(t => t.shared ? charList[0].daily[t.id] : char.daily[t.id]).length;
         const wDone = DATA.weekly.filter(t => char.weekly[t.id]).length;
-        btn.innerHTML = `
-            <div style="font-weight:bold; font-size:0.85em;">${char.name}</div>
+        btn.innerHTML = `<div style="font-weight:bold; font-size:0.85em; pointer-events:none;">${char.name}</div>
             <div class="multi-gauge">
                 <div class="gauge-layer"><div style="width:${(dDone/DATA.daily.length)*100}%; background:var(--progress-daily); height:100%"></div></div>
                 <div class="gauge-layer"><div style="width:${(wDone/DATA.weekly.length)*100}%; background:var(--progress-weekly); height:100%"></div></div>
-                <div class="gauge-layer">
-                    <div class="void-cell ${char.void['v1']?'done-1':''}"></div>
-                    <div class="void-cell ${char.void['v2']?'done-2':''}"></div>
-                    <div class="void-cell ${char.void['v3']?'done-3':''}"></div>
-                </div>
+                <div class="gauge-layer"><div class="void-cell ${char.void['v1']?'done-1':''}"></div><div class="void-cell ${char.void['v2']?'done-2':''}"></div><div class="void-cell ${char.void['v3']?'done-3':''}"></div></div>
             </div>`;
         return btn;
     }
@@ -243,16 +224,13 @@
         const charColor = CHAR_COLORS[cur.name];
         const dList = document.getElementById('daily-list'); const wList = document.getElementById('weekly-list');
         dList.innerHTML = ''; wList.innerHTML = '';
-        
         DATA.void.forEach((t, i) => {
             const voidColors = ['#e599f7', '#be4bdb', '#862e9c'];
             wList.appendChild(createTaskUI(t.name, cur.void[t.id], t.day, () => { cur.void[t.id] = !cur.void[t.id]; render(); }, voidColors[i], t.id, 'void', charColor));
         });
         DATA.daily.forEach(t => {
             const done = t.shared ? charList[0].daily[t.id] : cur.daily[t.id];
-            dList.appendChild(createTaskUI(t.name, done, t.day, () => {
-                if (t.shared) { const n = !done; charList.forEach(c => c.daily[t.id] = n); } else cur.daily[t.id] = !done; render();
-            }, charColor, t.id, 'daily', charColor));
+            dList.appendChild(createTaskUI(t.name, done, t.day, () => { if (t.shared) { const n = !done; charList.forEach(c => c.daily[t.id] = n); } else cur.daily[t.id] = !done; render(); }, charColor, t.id, 'daily', charColor));
         });
         DATA.weekly.forEach(t => wList.appendChild(createTaskUI(t.name, cur.weekly[t.id], null, () => { cur.weekly[t.id] = !cur.weekly[t.id]; render(); }, charColor, t.id, 'weekly', charColor)));
     }
@@ -262,36 +240,29 @@
         const content = document.createElement('div'); content.className = 'task-content';
         let badge = day ? `<span class="badge" style="background:${badgeColor}">${day}</span>` : '';
         content.innerHTML = `${badge}<span>${name}</span>`;
-        
         const all = document.createElement('div'); all.className = 'all-check-wrapper';
         all.innerHTML = `<span style="font-size:9px; font-weight:bold; color:var(--shared-tag)">ALL</span><button class="badge" style="background:${done ? charColor : 'var(--shared-tag)'}">${done?'✓':'A'}</button>`;
         all.onclick = (e) => { e.stopPropagation(); const n = !done; charList.forEach(c => { if(c.fav) c[type][taskId] = n; }); render(); };
-        
-        div.appendChild(content); div.appendChild(all); 
-        div.onclick = onClick; return div;
+        div.appendChild(content); div.appendChild(all); div.onclick = onClick; return div;
     }
 
     function saveHistory() {
         const today = new Date().toISOString().split('T')[0];
-        const history = JSON.parse(localStorage.getItem('gcc_hist_v26') || '{}');
+        const history = JSON.parse(localStorage.getItem('gcc_hist_v27') || '{}');
         const favs = charList.filter(c => c.fav);
         if (favs.length > 0) {
             let t = 0, d = 0;
             favs.forEach(c => { DATA.daily.forEach(task => { t++; if(task.shared ? charList[0].daily[task.id] : c.daily[task.id]) d++; }); });
             history[today] = Math.round((d / t) * 100);
         }
-        localStorage.setItem('gcc_hist_v26', JSON.stringify(history));
-
-        const weeklyHistory = JSON.parse(localStorage.getItem('gcc_week_v26') || '{}');
+        localStorage.setItem('gcc_hist_v27', JSON.stringify(history));
+        const weeklyHistory = JSON.parse(localStorage.getItem('gcc_week_v27') || '{}');
         const now = new Date();
         const yearWeek = `${now.getFullYear()}-W${getWeekNumber(now)}`;
         let wt = 0, wd = 0;
-        favs.forEach(c => { 
-            DATA.weekly.forEach(task => { wt++; if(c.weekly[task.id]) wd++; });
-            DATA.void.forEach(task => { wt++; if(c.void[task.id]) wd++; });
-        });
+        favs.forEach(c => { DATA.weekly.forEach(task => { wt++; if(c.weekly[task.id]) wd++; }); DATA.void.forEach(task => { wt++; if(c.void[task.id]) wd++; }); });
         weeklyHistory[yearWeek] = favs.length ? Math.round((wd / wt) * 100) : 0;
-        localStorage.setItem('gcc_week_v26', JSON.stringify(weeklyHistory));
+        localStorage.setItem('gcc_week_v27', JSON.stringify(weeklyHistory));
     }
 
     function getWeekNumber(d) {
@@ -305,16 +276,15 @@
         const grid = document.getElementById('calendar-grid'); grid.innerHTML = '';
         const weekGauges = document.getElementById('week-gauges'); weekGauges.innerHTML = '';
         const now = new Date(); const year = now.getFullYear(); const month = now.getMonth();
-        const firstDay = new Date(year, month, 1).getDay();
-        const lastDay = new Date(year, month + 1, 0).getDate();
+        const firstDay = new Date(year, month, 1).getDay(); const lastDay = new Date(year, month + 1, 0).getDate();
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
         for(let i=0; i<startOffset; i++) grid.appendChild(document.createElement('div'));
-        const history = JSON.parse(localStorage.getItem('gcc_hist_v26') || '{}');
+        const history = JSON.parse(localStorage.getItem('gcc_hist_v27') || '{}');
         for (let i = 1; i <= lastDay; i++) {
             const dateStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
             grid.appendChild(createFillCell(i, history[dateStr] || 0, '#2b8a3e'));
         }
-        const weeklyHistory = JSON.parse(localStorage.getItem('gcc_week_v26') || '{}');
+        const weeklyHistory = JSON.parse(localStorage.getItem('gcc_week_v27') || '{}');
         for(let w=1; w<=5; w++) {
             const weekKey = `${year}-W${getWeekNumber(new Date(year, month, Math.min(lastDay, (w-1)*7 + 1)))}`;
             weekGauges.appendChild(createFillCell(w + '주차', weeklyHistory[weekKey] || 0, '#339af0'));
@@ -331,12 +301,7 @@
     }
 
     function toggleTheme() { document.body.classList.toggle('dark-mode'); }
-    function toggleFilter() { 
-        filterUnfinished = !filterUnfinished; 
-        document.getElementById('filter-btn').classList.toggle('active-filter');
-        render(); 
-    }
-    
+    function toggleFilter() { filterUnfinished = !filterUnfinished; document.getElementById('filter-btn').classList.toggle('active-filter'); render(); }
     function allowDrop(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
     function dragLeave(el) { el.classList.remove('drag-over'); }
     function dropToFavorite(e) { e.preventDefault(); dragLeave(e.currentTarget); const char = charList.find(c => c.id === draggedCharId); if (char) { char.fav = true; render(); } }
